@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/small_padding">
+
+        <TextView
+            android:id="@+id/tvFilterHeading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_by"
+            android:textSize="@dimen/large_text"
+            android:layout_marginBottom="@dimen/small_padding" />
+
+        <EditText
+            android:id="@+id/etFilterClass"
+            android:layout_width="@dimen/filter_input_size"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/tvFilterHeading"/>
+
+        <EditText
+            android:id="@+id/etFilterTown"
+            android:layout_width="@dimen/filter_input_size"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/etFilterClass"/>
+
+        <EditText
+            android:id="@+id/etFilterDistance"
+            android:layout_width="@dimen/filter_input_size"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/etFilterTown"/>
+
+        <TextView
+            android:id="@+id/tvFilterClass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/by_class"
+            android:textSize="@dimen/medium_text"
+            android:layout_alignBaseline="@id/etFilterClass"/>
+
+        <TextView
+            android:id="@+id/tvFilterTown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/by_town"
+            android:textSize="@dimen/medium_text"
+            android:layout_alignBaseline="@id/etFilterTown" />
+
+        <TextView
+            android:id="@+id/tvFilterDistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/by_distance"
+            android:textSize="@dimen/medium_text"
+            android:layout_alignBaseline="@id/etFilterDistance"/>
+
+        <Button
+            android:id="@+id/bRefreshFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/refresh"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/medium_padding"
+            android:layout_below="@id/etFilterDistance"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvResultsHeading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/results"
+            android:textSize="@dimen/large_text"
+            android:layout_marginBottom="@dimen/small_padding"/>
+
+        <ListView
+            android:id="@+id/lvSearchResults"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvResultsHeading">
+        </ListView>
+    </RelativeLayout>
+</LinearLayout>
+</ScrollView>
