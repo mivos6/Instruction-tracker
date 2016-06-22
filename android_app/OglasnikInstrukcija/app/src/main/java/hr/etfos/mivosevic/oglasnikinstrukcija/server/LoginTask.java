@@ -24,10 +24,10 @@ import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
  * Created by admin on 18.6.2016..
  */
 public class LoginTask extends AsyncTask<String, Void, User> {
-    private Context mContext;
+    private Context context;
 
     public LoginTask(Context c) {
-        this.mContext = c;
+        this.context = c;
     }
 
     @Override
@@ -41,17 +41,16 @@ public class LoginTask extends AsyncTask<String, Void, User> {
         String password = params[1];
 
         try {
-            URL link = new URL(Constants.SERVER_ADDRESS + Constants.LOGIN_SCRIPT);
+            URL link = new URL(Constants.SERVER_ADDRESS + Constants.CHECK_USER_SCRIPT);
             HttpURLConnection conn = (HttpURLConnection) link.openConnection();
-
             conn.setDoOutput(true);
-            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
 
             String data = URLEncoder.encode(Constants.USERNAME_DB_TAG, "UTF-8")
                     + "=" + URLEncoder.encode(username, "UTF-8")
                     + "&" + URLEncoder.encode(Constants.PASSWORD_DB_TAG, "UTF-8")
                     + "=" + URLEncoder.encode(password, "UTF-8");
 
+            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
             writer.write(data);
             writer.flush();
 
@@ -92,13 +91,13 @@ public class LoginTask extends AsyncTask<String, Void, User> {
     protected void onPostExecute(User user) {
         super.onPostExecute(user);
         if (user == null) {
-            Utility.displayToast(mContext, "Username and password combination does not exist.", false);
+            Utility.displayToast(this.context, "Username and password combination does not exist.", false);
             return;
         }
 
-        Utility.displayToast(mContext, "Successful login: " + user.getUsername(), false);
-        Intent i = new Intent(mContext, MyProfileActivity.class);
+        Utility.displayToast(this.context, "Successful login: " + user.getUsername(), false);
+        Intent i = new Intent(this.context, MyProfileActivity.class);
         i.putExtra(Constants.USER_TAG, user);
-        mContext.startActivity(i);
+        this.context.startActivity(i);
     }
 }

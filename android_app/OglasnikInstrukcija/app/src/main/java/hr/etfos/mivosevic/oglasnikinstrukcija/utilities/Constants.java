@@ -5,7 +5,10 @@ package hr.etfos.mivosevic.oglasnikinstrukcija.utilities;
  */
 public class Constants {
     public static final String SERVER_ADDRESS = "http://10.0.3.2/instruction_tracker/";
-    public static final String LOGIN_SCRIPT = "login.php";
+    public static final String SERVER_UPLOAD_DIR = "Uploads/";
+    public static final String CHECK_USER_SCRIPT = "check_user.php";
+    public static final String INSERT_USER_SCRIPT = "insert_user.php";
+    public static final String FILE_UPLOAD_SCRIPT = "file_upload.php";
 
     public static final String USERNAME_DB_TAG = "username";
     public static final String PASSWORD_DB_TAG = "passw";

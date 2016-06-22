@@ -1,5 +1,6 @@
 package hr.etfos.mivosevic.oglasnikinstrukcija.activities;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,7 +10,7 @@ import android.widget.EditText;
 import hr.etfos.mivosevic.oglasnikinstrukcija.R;
 import hr.etfos.mivosevic.oglasnikinstrukcija.server.LoginTask;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
     EditText etUserName;
     EditText etPassword;
     Button bLogin;
@@ -28,17 +29,22 @@ public class LoginActivity extends AppCompatActivity {
         bLogin = (Button) findViewById(R.id.bLogin);
         bRegister = (Button) findViewById(R.id.bRegister);
 
-        bLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                login();
-            }
-        });
+        bLogin.setOnClickListener(this);
+        bRegister.setOnClickListener(this);
     }
 
-    private void login() {
-        String username = etUserName.getText().toString();
-        String password = etPassword.getText().toString();
-        new LoginTask(this).execute(username, password);
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.bLogin:
+                String username = etUserName.getText().toString();
+                String password = etPassword.getText().toString();
+                new LoginTask(this).execute(username, password);
+                break;
+            case R.id.bRegister:
+                Intent i = new Intent(this, RegisterActivity.class);
+                startActivity(i);
+                break;
+        }
     }
 }
