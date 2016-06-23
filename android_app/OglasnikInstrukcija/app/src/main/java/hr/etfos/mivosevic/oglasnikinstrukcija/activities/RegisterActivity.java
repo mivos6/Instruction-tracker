@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import hr.etfos.mivosevic.oglasnikinstrukcija.R;
 import hr.etfos.mivosevic.oglasnikinstrukcija.data.User;
 import hr.etfos.mivosevic.oglasnikinstrukcija.server.RegisterTask;
+import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Constants;
+import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener{
     ImageView imgSignupPortrait;
@@ -74,7 +76,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch (v.getId()) {
             case R.id.bConfirm:
                 //Send data to server
-                if (verifyInputs()) {
+                if (verifyInput()) {
                     String location = etTown.getText().toString() + "\n"
                             + etStreet.getText().toString() + "\n"
                             + etNumber.getText().toString();
@@ -106,7 +108,42 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    private boolean verifyInputs() {
+    private boolean verifyInput() {
+        //Check if username is valid
+        if (!etUsername.getText().toString().matches(Constants.USERNAME_REGEX)){
+            Utility.displayToast(this, Constants.USERNAME_NOT_VALID, true);
+            return false;
+        }
+        //Check if password is valid
+        if (!etPassword.getText().toString().matches(Constants.PASSWORD_REGEX)) {
+            Utility.displayToast(this, Constants.PASSWORD_NOT_VALID, true);
+            return false;
+        }
+        //Check if repeated password matches
+        if (!etPassword.getText().toString().equals(etRepeatPassword.getText().toString())) {
+            Utility.displayToast(this, Constants.PASSWORD_NOT_MATCH, false);
+            return false;
+        }
+        //Check if email is valid (regular expression RFC 5322 Official Standard)
+        if (!etEmail.getText().toString().matches(Constants.EMAIL_REGEX)) {
+            Utility.displayToast(this, Constants.EMAIL_NOT_VALID, false);
+            return false;
+        }
+        //Check phone number
+        if (!etPhone.getText().toString().equals("")) {
+            if (!etPhone.getText().toString().matches("^[\\d]+$")) {
+                Utility.displayToast(this, Constants.PHONE_NOT_VALID, false);
+                return false;
+            }
+        }
+        //Check town name, street name and number
+        if (!(etTown.getText().toString().matches("^[a-zA-Z ,.'-]+$")
+            && etStreet.getText().toString().matches("^[a-zA-Z ,.'-]+$")
+            && etNumber.getText().toString().matches("^[\\d]+$"))) {
+            Utility.displayToast(this, Constants.ADDRESS_NOT_VALID, false);
+            return false;
+        }
+
         return true;
     }
 }

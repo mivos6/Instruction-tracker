@@ -26,6 +26,7 @@ import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
 public class RegisterTask extends AsyncTask<User, Void, Boolean> {
     private Context context;
     private User logged;
+    private String errorMsg = "Failed registration: ";
 
     public RegisterTask(Context c) {
         this.context = c;
@@ -66,6 +67,7 @@ public class RegisterTask extends AsyncTask<User, Void, Boolean> {
             OutputStreamWriter wr = new OutputStreamWriter(dataConn.getOutputStream());
             wr.write(postData);
             wr.flush();
+            wr.close();
 
             BufferedReader r = new BufferedReader(new InputStreamReader(dataConn.getInputStream()));
             String result = r.readLine();
@@ -73,7 +75,9 @@ public class RegisterTask extends AsyncTask<User, Void, Boolean> {
             String line;
             while ((line = r.readLine()) != null) {
                 Log.d("MILAN", line);
+                errorMsg += line + "\n";
             }
+            r.close();
             if (!result.equals("Success")) return false;
 
             //Upload user portrait to server
@@ -102,7 +106,7 @@ public class RegisterTask extends AsyncTask<User, Void, Boolean> {
 
             dos.writeBytes(twoHyphens + boundary + lineEnd);
             dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";"
-                    + "filename=\"" + this.logged.getImgUrl() + "\"" + lineEnd);
+                    + "filename=\"" + this.logged.getUsername() + ".jpg\"" + lineEnd);
             dos.writeBytes(lineEnd);
 
             bytesAvailable = fileStream.available();
@@ -135,7 +139,9 @@ public class RegisterTask extends AsyncTask<User, Void, Boolean> {
             Log.d("MILAN", result);
             while ((line = r.readLine()) != null) {
                 Log.d("MILAN", line);
+                errorMsg += line + "\n";
             }
+            r.close();
             if (!result.equals("Success")) return false;
         }
         catch (Exception e) {
@@ -157,7 +163,10 @@ public class RegisterTask extends AsyncTask<User, Void, Boolean> {
             this.context.startActivity(i);
         }
         else {
-            Utility.displayToast(this.context, "Failed registration.", false);
+            if (errorMsg.contains("Duplicate entry")) {
+                errorMsg = "Failed registration: Username already exists";
+            }
+            Utility.displayToast(this.context, errorMsg, false);
         }
     }
 }

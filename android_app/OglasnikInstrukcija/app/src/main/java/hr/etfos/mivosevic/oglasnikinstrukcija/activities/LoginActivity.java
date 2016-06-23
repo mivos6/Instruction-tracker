@@ -9,6 +9,8 @@ import android.widget.EditText;
 
 import hr.etfos.mivosevic.oglasnikinstrukcija.R;
 import hr.etfos.mivosevic.oglasnikinstrukcija.server.LoginTask;
+import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Constants;
+import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
     EditText etUserName;
@@ -37,14 +39,31 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bLogin:
-                String username = etUserName.getText().toString();
-                String password = etPassword.getText().toString();
-                new LoginTask(this).execute(username, password);
+                if (validateInput()) {
+                    String username = etUserName.getText().toString();
+                    String password = etPassword.getText().toString();
+                    new LoginTask(this).execute(username, password);
+                }
                 break;
             case R.id.bRegister:
                 Intent i = new Intent(this, RegisterActivity.class);
                 startActivity(i);
                 break;
         }
+    }
+
+    private boolean validateInput() {
+        //Check if username is valid
+        if (!etUserName.getText().toString().matches(Constants.USERNAME_REGEX)){
+            Utility.displayToast(this, Constants.USERNAME_NOT_VALID, true);
+            return false;
+        }
+        //Check if password is valid
+        if (!etPassword.getText().toString().matches(Constants.PASSWORD_REGEX)) {
+            Utility.displayToast(this, Constants.PASSWORD_NOT_VALID, true);
+            return false;
+        }
+
+        return true;
     }
 }

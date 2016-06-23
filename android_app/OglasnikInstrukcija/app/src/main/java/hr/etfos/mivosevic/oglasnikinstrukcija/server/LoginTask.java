@@ -25,6 +25,7 @@ import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
  */
 public class LoginTask extends AsyncTask<String, Void, User> {
     private Context context;
+    private String errorMsg = "Username and password combination does not exist.";
 
     public LoginTask(Context c) {
         this.context = c;
@@ -53,20 +54,29 @@ public class LoginTask extends AsyncTask<String, Void, User> {
             OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
             writer.write(data);
             writer.flush();
+            writer.close();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             StringBuilder builder = new StringBuilder();
+            String firstLine = reader.readLine();
             String line;
             while ((line = reader.readLine()) != null) {
                 builder.append(line);
             }
+            reader.close();
 
-            if (builder.length() == 0) return null;
+            if (builder.length() == 0) {
+                return null;
+            }
+            if (!firstLine.equals("Success")) {
+                errorMsg = builder.toString();
+                return null;
+            }
 
             return getUserFromJSON(builder.toString());
         }
         catch (Exception e) {
-            Log.d("MILAN", e.getMessage());
+            Log.d("MILAN", "Exception: " + e.getMessage());
             return null;
         }
     }
@@ -91,7 +101,7 @@ public class LoginTask extends AsyncTask<String, Void, User> {
     protected void onPostExecute(User user) {
         super.onPostExecute(user);
         if (user == null) {
-            Utility.displayToast(this.context, "Username and password combination does not exist.", false);
+            Utility.displayToast(this.context, errorMsg, false);
             return;
         }
 

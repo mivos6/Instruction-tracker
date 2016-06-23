@@ -9,5 +9,5 @@
 	@mysqli_query($conn, $query_str);
 	
 	if (mysqli_affected_rows($conn) > 0) echo "Success";
-	else echo "Fail";
+	else echo "Fail\n".mysqli_error($conn);
 ?>

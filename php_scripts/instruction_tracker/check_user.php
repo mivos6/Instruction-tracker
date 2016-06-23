@@ -10,10 +10,12 @@
 		
 	$result = @mysqli_query($conn, $query_str);
 	if (!$result) {
-		die("Invalid query: ".mysqli_error());
+		die("Fail\n".mysqli_error($conn));
 	}
 	
 	$row = mysqli_fetch_array($result);
-	if ($row)
+	if ($row) {
+		echo "Success\n";
 		echo json_encode($row);
+	}
 ?>
