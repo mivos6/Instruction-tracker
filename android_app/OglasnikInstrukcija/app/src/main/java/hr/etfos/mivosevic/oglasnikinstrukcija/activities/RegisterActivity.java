@@ -1,14 +1,24 @@
 package hr.etfos.mivosevic.oglasnikinstrukcija.activities;
 
+import android.content.CursorLoader;
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.URL;
 
 import hr.etfos.mivosevic.oglasnikinstrukcija.R;
 import hr.etfos.mivosevic.oglasnikinstrukcija.data.User;
@@ -18,8 +28,7 @@ import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener{
     ImageView imgSignupPortrait;
-    String imagePath = Environment.getExternalStorageDirectory().getPath()
-            + "/Download/icon-user-default.png";
+    String imagePath =  null; //Environment.getExternalStorageDirectory().getPath() + "/Download/icon-user-default.png";
 
     EditText etName;
     EditText etUsername;
@@ -95,6 +104,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 break;
             case R.id.bCancel:
                 //Close activity
+                this.finish();
                 break;
             case R.id.bCurrentLocation:
                 //Get location from location service
@@ -103,7 +113,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 //Open Google Map and get location from map marker
                 break;
             case R.id.imgSignupPortrait:
-                //Set ImageView from selected file
+                //Launch galery to select image
+                Intent i = new Intent();
+                i.setAction(Intent.ACTION_PICK);
+                i.setType("image/*");
+                startActivityForResult(i, Constants.SELECT_IMAGE_CODE);
                 break;
         }
     }
@@ -145,5 +159,45 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
 
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        //Display the selected image on screen
+        if (requestCode == Constants.SELECT_IMAGE_CODE) {
+            if (resultCode == RESULT_OK) {
+                Uri imageUri = data.getData();
+                try {
+                    InputStream is = getContentResolver().openInputStream(imageUri);
+
+                    BitmapFactory.Options bmpOpt = new BitmapFactory.Options();
+                    //Opcija za skaliranje slike na 1/4 izvornih dimenzija.
+                    bmpOpt.inSampleSize = 4;
+                    imgSignupPortrait.setImageBitmap(BitmapFactory.decodeStream(is, null, bmpOpt));
+
+                    //Get absolutr path from Uri
+                    this.imagePath = getPathFromUri(imageUri);
+                } catch (FileNotFoundException e) {
+                    Log.d("MILAN", e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private String getPathFromUri(Uri data) {
+        String result;
+
+        String[] projection = {MediaStore.Images.Media.DATA};
+        CursorLoader loader = new CursorLoader(this, data, projection, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        result = cursor.getString(columnIndex);
+        cursor.close();
+
+        return result;
     }
 }

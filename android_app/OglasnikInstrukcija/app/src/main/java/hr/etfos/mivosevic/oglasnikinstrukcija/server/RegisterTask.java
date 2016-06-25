@@ -36,16 +36,19 @@ public class RegisterTask extends AsyncTask<User, Void, Boolean> {
     protected Boolean doInBackground(User... params) {
         this.logged = params[0];
 
-        String[] pathArray = this.logged.getImgUrl().split("/");
-        String serverFilePath = Constants.SERVER_ADDRESS
-                + Constants.SERVER_UPLOAD_DIR
-                + pathArray[pathArray.length - 1];
+        String serverFilePath = "";
+        if (this.logged.getImgUrl() != null) {
+            serverFilePath = Constants.SERVER_ADDRESS
+                    + Constants.SERVER_UPLOAD_DIR
+                    + this.logged.getUsername() + ".jpg";
+        }
 
         try {
             //POST user logged and write it to database
             URL dataLink = new URL(Constants.SERVER_ADDRESS + Constants.INSERT_USER_SCRIPT);
             HttpURLConnection dataConn = (HttpURLConnection) dataLink.openConnection();
             dataConn.setDoOutput(true);
+
 
             String postData = URLEncoder.encode(Constants.USERNAME_DB_TAG, "UTF-8")
                     + "=" + URLEncoder.encode(this.logged.getUsername(), "UTF-8")
@@ -80,72 +83,75 @@ public class RegisterTask extends AsyncTask<User, Void, Boolean> {
             r.close();
             if (!result.equals("Success")) return false;
 
-            //Upload user portrait to server
-            String lineEnd = "\r\n";
-            String twoHyphens = "--";
-            String boundary = "*****";
-            int bytesRead, bytesAvailable, bufferSize;
-            byte[] buffer;
-            int maxBufferSize = 1 * 1024 * 1024;
-            File sourceFile = new File(this.logged.getImgUrl());
+            if (this.logged.getImgUrl() != null) {
+                //Upload user portrait to server
+                String lineEnd = "\r\n";
+                String twoHyphens = "--";
+                String boundary = "*****";
+                int bytesRead, bytesAvailable, bufferSize;
+                byte[] buffer;
+                int maxBufferSize = 1 * 1024 * 1024;
+                File sourceFile = new File(this.logged.getImgUrl());
 
-            FileInputStream fileStream = new FileInputStream(sourceFile);
+                FileInputStream fileStream = new FileInputStream(sourceFile);
 
-            URL fileLink = new URL(Constants.SERVER_ADDRESS + Constants.FILE_UPLOAD_SCRIPT);
-            HttpURLConnection fileConn = (HttpURLConnection) fileLink.openConnection();
-            fileConn.setDoInput(true);
-            fileConn.setDoOutput(true);
-            fileConn.setUseCaches(false);
-            fileConn.setRequestMethod("POST");
-            fileConn.setRequestProperty("Connection", "Keep-Alive");
-            fileConn.setRequestProperty("ENCTYPE", "multipart/form-data");
-            fileConn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-            fileConn.setRequestProperty("uploaded_file", this.logged.getImgUrl());
+                URL fileLink = new URL(Constants.SERVER_ADDRESS + Constants.FILE_UPLOAD_SCRIPT);
+                HttpURLConnection fileConn = (HttpURLConnection) fileLink.openConnection();
+                fileConn.setDoInput(true);
+                fileConn.setDoOutput(true);
+                fileConn.setUseCaches(false);
+                fileConn.setRequestMethod("POST");
+                fileConn.setRequestProperty("Connection", "Keep-Alive");
+                fileConn.setRequestProperty("ENCTYPE", "multipart/form-data");
+                fileConn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+                fileConn.setRequestProperty("uploaded_file", this.logged.getImgUrl());
 
-            DataOutputStream dos = new DataOutputStream(fileConn.getOutputStream());
+                DataOutputStream dos = new DataOutputStream(fileConn.getOutputStream());
 
-            dos.writeBytes(twoHyphens + boundary + lineEnd);
-            dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";"
-                    + "filename=\"" + this.logged.getUsername() + ".jpg\"" + lineEnd);
-            dos.writeBytes(lineEnd);
+                dos.writeBytes(twoHyphens + boundary + lineEnd);
+                dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";"
+                        + "filename=\"" + this.logged.getUsername() + ".jpg\"" + lineEnd);
+                dos.writeBytes(lineEnd);
 
-            bytesAvailable = fileStream.available();
-            bufferSize = Math.min(bytesAvailable, maxBufferSize);
-            buffer = new byte[bufferSize];
-
-            bytesRead = fileStream.read(buffer, 0, bufferSize);
-            while (bytesRead > 0) {
-                //Write buffer to output
-                dos.write(buffer, 0, bufferSize);
-
-                //Read next buffer from input
                 bytesAvailable = fileStream.available();
                 bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                buffer = new byte[bufferSize];
+
                 bytesRead = fileStream.read(buffer, 0, bufferSize);
+                while (bytesRead > 0) {
+                    //Write buffer to output
+                    dos.write(buffer, 0, bufferSize);
+
+                    //Read next buffer from input
+                    bytesAvailable = fileStream.available();
+                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                    bytesRead = fileStream.read(buffer, 0, bufferSize);
+                }
+
+                dos.writeBytes(lineEnd);
+                dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+                Log.d("MILAN", "Response code: " + fileConn.getResponseCode()
+                        + "\n" + fileConn.getResponseMessage());
+
+                fileStream.close();
+                dos.flush();
+                dos.close();
+
+                r = new BufferedReader(new InputStreamReader(fileConn.getInputStream()));
+                result = r.readLine();
+                Log.d("MILAN", result);
+                while ((line = r.readLine()) != null) {
+                    Log.d("MILAN", line);
+                    errorMsg += line + "\n";
+                }
+                r.close();
+                if (!result.equals("Success")) return false;
             }
-
-            dos.writeBytes(lineEnd);
-            dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-
-            Log.d("MILAN", "Response code: " + fileConn.getResponseCode()
-                    + "\n" + fileConn.getResponseMessage());
-
-            fileStream.close();
-            dos.flush();
-            dos.close();
-
-            r = new BufferedReader(new InputStreamReader(fileConn.getInputStream()));
-            result = r.readLine();
-            Log.d("MILAN", result);
-            while ((line = r.readLine()) != null) {
-                Log.d("MILAN", line);
-                errorMsg += line + "\n";
-            }
-            r.close();
-            if (!result.equals("Success")) return false;
         }
         catch (Exception e) {
             Log.d("MILAN", e.getMessage());
+            e.printStackTrace();
             return false;
         }
 

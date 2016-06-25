@@ -77,6 +77,7 @@ public class LoginTask extends AsyncTask<String, Void, User> {
         }
         catch (Exception e) {
             Log.d("MILAN", "Exception: " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }

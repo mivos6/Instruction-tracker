@@ -2,7 +2,7 @@
     <string name="app_name">Oglasnik Instrukcija</string>
     <string name="login">Prijava</string>
     <string name="signup">Registracija</string>
-    <string name="email_example">username@domain.com</string>
+    <string name="email_example">Username</string>
     <string name="pass_hint">Password</string>
     <string name="portrait">Korisnički portret</string>
     <string name="your_image">Vaša slika</string>

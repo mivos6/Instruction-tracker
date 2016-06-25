@@ -31,4 +31,8 @@ public class Constants {
     public static final String PHONE_NOT_VALID = "Phone number not valid";
     public static final String ADDRESS_NOT_VALID = "Address not valid";
     public static final String PASSWORD_NOT_MATCH = "Passwords do not match";
+
+    public static final String USER_PREFS_FILE = "userPrefs";
+
+    public static final int SELECT_IMAGE_CODE = 123;
 }
