@@ -132,7 +132,7 @@
         android:id="@+id/etAbout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/signup_input_vsize"
-        android:inputType="text"
+        android:inputType="textMultiLine"
         android:hint="@string/about_hint"
         android:gravity="top"
         android:layout_marginBottom="@dimen/small_padding"/>

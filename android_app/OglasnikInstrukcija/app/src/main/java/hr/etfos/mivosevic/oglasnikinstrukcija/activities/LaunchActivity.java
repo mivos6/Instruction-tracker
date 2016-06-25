@@ -16,6 +16,12 @@ public class LaunchActivity extends AppCompatActivity {
         launchApp();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.finish();
+    }
+
     private void launchApp() {
         SharedPreferences userPrefs = getSharedPreferences(Constants.USER_PREFS_FILE, 0);
 

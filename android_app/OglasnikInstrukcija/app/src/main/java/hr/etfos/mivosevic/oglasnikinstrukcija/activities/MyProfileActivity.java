@@ -1,16 +1,40 @@
 package hr.etfos.mivosevic.oglasnikinstrukcija.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import hr.etfos.mivosevic.oglasnikinstrukcija.R;
 import hr.etfos.mivosevic.oglasnikinstrukcija.data.User;
+import hr.etfos.mivosevic.oglasnikinstrukcija.server.SetImageTask;
 import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Constants;
 
-public class MyProfileActivity extends AppCompatActivity {
+public class MyProfileActivity extends AppCompatActivity
+        implements View.OnClickListener {
     private User logged;
+
+    private ImageView imgMyPortrait;
+    private TextView tvMyName;
+    private TextView tvMyUsername;
+    private TextView tvMyEmail;
+    private Button bEditData;
+    private Button bLogout;
+
+    private ListView lvMyClasses;
+    private Button bAddClass;
+
+    private EditText etSearchClass;
+    private EditText etSearchTown;
+    private EditText etSearchDistance;
+    private Button bStartSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +42,15 @@ public class MyProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my_profile);
 
         setLoggedUser();
+        initialize();
+        setData();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences userPrefs = getSharedPreferences(Constants.USER_PREFS_FILE, 0);
+        if (!userPrefs.contains(Constants.USERNAME_DB_TAG)) this.finish();
     }
 
     private void setLoggedUser() {
@@ -50,6 +83,58 @@ public class MyProfileActivity extends AppCompatActivity {
                     prefs.getString(Constants.ABOUT_DB_TAG, ""),
                     prefs.getString(Constants.IMAGEURL_DB_TAG, "")
             );
+        }
+    }
+
+    private void initialize() {
+        imgMyPortrait = (ImageView) findViewById(R.id.imgMyPortrait);
+        tvMyName = (TextView) findViewById(R.id.tvMyName);
+        tvMyUsername = (TextView) findViewById(R.id.tvMyUsername);
+        tvMyEmail = (TextView) findViewById(R.id.tvMyEmail);
+        bEditData = (Button) findViewById(R.id.bEditData);
+        bLogout = (Button) findViewById(R.id.bLogout);
+        lvMyClasses = (ListView) findViewById(R.id.lvMyClasses);
+        bAddClass = (Button) findViewById(R.id.bAddClass);
+        etSearchClass = (EditText) findViewById(R.id.etSearchClass);
+        etSearchTown = (EditText) findViewById(R.id.etSearchTown);
+        etSearchDistance = (EditText) findViewById(R.id.etSearchDistance);
+        bStartSearch = (Button) findViewById(R.id.bStartSearch);
+
+        bEditData.setOnClickListener(this);
+        bLogout.setOnClickListener(this);
+        bAddClass.setOnClickListener(this);
+        bStartSearch.setOnClickListener(this);
+    }
+
+    private void setData() {
+        tvMyName.setText(this.logged.getName());
+        tvMyUsername.setText(this.logged.getUsername());
+        tvMyEmail.setText(this.logged.getEmail());
+
+        new SetImageTask(imgMyPortrait).execute(this.logged.getImgUrl());
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.bEditData:
+                //Open RegisterActivity to edit user data
+                break;
+            case R.id.bLogout:
+                //Clear user data from shared prefs fila and switch to LoginActivity
+                SharedPreferences.Editor e = getSharedPreferences(Constants.USER_PREFS_FILE, 0).edit();
+                e.clear();
+                e.commit();
+                Intent i = new Intent(this, LoginActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
+                break;
+            case R.id.bAddClass:
+                //Add item to database and update the lvMyClasses
+                break;
+            case R.id.bStartSearch:
+                //Begin store filters and open SearchResultsActivity
+                break;
         }
     }
 }

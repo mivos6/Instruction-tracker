@@ -26,25 +26,26 @@ import hr.etfos.mivosevic.oglasnikinstrukcija.server.RegisterTask;
 import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Constants;
 import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
 
-public class RegisterActivity extends AppCompatActivity implements View.OnClickListener{
-    ImageView imgSignupPortrait;
-    String imagePath =  null; //Environment.getExternalStorageDirectory().getPath() + "/Download/icon-user-default.png";
+public class RegisterActivity extends AppCompatActivity
+        implements View.OnClickListener {
+    private ImageView imgSignupPortrait;
+    private String imagePath =  null; //Environment.getExternalStorageDirectory().getPath() + "/Download/icon-user-default.png";
 
-    EditText etName;
-    EditText etUsername;
-    EditText etPassword;
-    EditText etRepeatPassword;
-    EditText etEmail;
-    EditText etPhone;
-    EditText etTown;
-    EditText etStreet;
-    EditText etNumber;
-    EditText etAbout;
+    private EditText etName;
+    private EditText etUsername;
+    private EditText etPassword;
+    private EditText etRepeatPassword;
+    private EditText etEmail;
+    private EditText etPhone;
+    private EditText etTown;
+    private EditText etStreet;
+    private EditText etNumber;
+    private EditText etAbout;
 
-    Button bCurrentLocation;
-    Button bMap;
-    Button bCancel;
-    Button bConfirm;
+    private Button bCurrentLocation;
+    private Button bMap;
+    private Button bCancel;
+    private Button bConfirm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
