@@ -150,7 +150,7 @@ public class RegisterTask extends AsyncTask<User, Void, Boolean> {
             }
         }
         catch (Exception e) {
-            Log.d("MILAN", e.getMessage());
+            Log.d("MILAN", "Exception: " + e.getMessage());
             e.printStackTrace();
             return false;
         }

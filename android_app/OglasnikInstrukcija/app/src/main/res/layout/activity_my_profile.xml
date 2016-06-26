@@ -76,19 +76,19 @@
             android:layout_below="@id/bEditData"/>
 
         <ListView
-            android:id="@+id/lvMyClasses"
+            android:id="@+id/lvMySubjects"
             android:layout_width="@dimen/classes_width"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvClassesHeading">
         </ListView>
 
         <Button
-            android:id="@+id/bAddClass"
+            android:id="@+id/bAddSubject"
             android:layout_width="@dimen/small_button_size"
             android:layout_height="@dimen/small_button_size"
             android:text="@string/add_class"
-            android:layout_alignTop="@id/lvMyClasses"
-            android:layout_toRightOf="@id/lvMyClasses"
+            android:layout_alignTop="@id/lvMySubjects"
+            android:layout_toRightOf="@id/lvMySubjects"
             android:layout_marginLeft="@dimen/small_padding"/>
     </RelativeLayout>
 
@@ -105,7 +105,7 @@
             android:layout_marginBottom="@dimen/small_padding" />
 
         <EditText
-            android:id="@+id/etSearchClass"
+            android:id="@+id/etSearchSubject"
             android:layout_width="@dimen/filter_input_size"
             android:layout_height="wrap_content"
             android:inputType="text"
@@ -118,7 +118,7 @@
             android:layout_height="wrap_content"
             android:inputType="text"
             android:layout_alignParentRight="true"
-            android:layout_below="@id/etSearchClass"/>
+            android:layout_below="@id/etSearchSubject"/>
 
         <EditText
             android:id="@+id/etSearchDistance"
@@ -129,12 +129,12 @@
             android:layout_below="@id/etSearchTown"/>
 
         <TextView
-            android:id="@+id/tvSearchClass"
+            android:id="@+id/tvSearchSubject"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/by_class"
             android:textSize="@dimen/medium_text"
-            android:layout_alignBaseline="@id/etSearchClass"/>
+            android:layout_alignBaseline="@id/etSearchSubject"/>
 
         <TextView
             android:id="@+id/tvSearchTown"

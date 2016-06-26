@@ -38,7 +38,7 @@ public class SetImageTask extends AsyncTask<String, Void, Bitmap> {
             }
             else return null;
         } catch (Exception e) {
-            Log.d("MILAN", e.getMessage());
+            Log.d("MILAN", "Exception: " + e.getMessage());
             e.printStackTrace();
             return null;
         }

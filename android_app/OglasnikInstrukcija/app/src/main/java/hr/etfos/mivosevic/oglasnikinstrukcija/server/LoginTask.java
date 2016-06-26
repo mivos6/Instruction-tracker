@@ -109,6 +109,7 @@ public class LoginTask extends AsyncTask<String, Void, User> {
         Utility.displayToast(this.context, "Successful login: " + user.getUsername(), false);
         Intent i = new Intent(this.context, MyProfileActivity.class);
         i.putExtra(Constants.USER_TAG, user);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         this.context.startActivity(i);
     }
 }

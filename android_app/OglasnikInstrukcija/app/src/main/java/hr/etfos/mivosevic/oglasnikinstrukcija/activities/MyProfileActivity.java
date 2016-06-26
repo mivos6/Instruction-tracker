@@ -1,6 +1,6 @@
 package hr.etfos.mivosevic.oglasnikinstrukcija.activities;
 
-import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -13,12 +13,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import hr.etfos.mivosevic.oglasnikinstrukcija.R;
+import hr.etfos.mivosevic.oglasnikinstrukcija.data.Subject;
 import hr.etfos.mivosevic.oglasnikinstrukcija.data.User;
+import hr.etfos.mivosevic.oglasnikinstrukcija.dialogs.NewSubjectDialog;
+import hr.etfos.mivosevic.oglasnikinstrukcija.server.AddSubjectTask;
 import hr.etfos.mivosevic.oglasnikinstrukcija.server.SetImageTask;
+import hr.etfos.mivosevic.oglasnikinstrukcija.server.UserSubjectsTask;
 import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Constants;
 
 public class MyProfileActivity extends AppCompatActivity
-        implements View.OnClickListener {
+        implements View.OnClickListener,
+        NewSubjectDialog.NewSubjectDialogListener {
     private User logged;
 
     private ImageView imgMyPortrait;
@@ -28,10 +33,10 @@ public class MyProfileActivity extends AppCompatActivity
     private Button bEditData;
     private Button bLogout;
 
-    private ListView lvMyClasses;
-    private Button bAddClass;
+    private ListView lvMySubjects;
+    private Button bAddSubject;
 
-    private EditText etSearchClass;
+    private EditText etSearchSubject;
     private EditText etSearchTown;
     private EditText etSearchDistance;
     private Button bStartSearch;
@@ -51,6 +56,9 @@ public class MyProfileActivity extends AppCompatActivity
         super.onResume();
         SharedPreferences userPrefs = getSharedPreferences(Constants.USER_PREFS_FILE, 0);
         if (!userPrefs.contains(Constants.USERNAME_DB_TAG)) this.finish();
+
+        setLoggedUser();
+        setData();
     }
 
     private void setLoggedUser() {
@@ -93,16 +101,16 @@ public class MyProfileActivity extends AppCompatActivity
         tvMyEmail = (TextView) findViewById(R.id.tvMyEmail);
         bEditData = (Button) findViewById(R.id.bEditData);
         bLogout = (Button) findViewById(R.id.bLogout);
-        lvMyClasses = (ListView) findViewById(R.id.lvMyClasses);
-        bAddClass = (Button) findViewById(R.id.bAddClass);
-        etSearchClass = (EditText) findViewById(R.id.etSearchClass);
+        lvMySubjects = (ListView) findViewById(R.id.lvMySubjects);
+        bAddSubject = (Button) findViewById(R.id.bAddSubject);
+        etSearchSubject = (EditText) findViewById(R.id.etSearchSubject);
         etSearchTown = (EditText) findViewById(R.id.etSearchTown);
         etSearchDistance = (EditText) findViewById(R.id.etSearchDistance);
         bStartSearch = (Button) findViewById(R.id.bStartSearch);
 
         bEditData.setOnClickListener(this);
         bLogout.setOnClickListener(this);
-        bAddClass.setOnClickListener(this);
+        bAddSubject.setOnClickListener(this);
         bStartSearch.setOnClickListener(this);
     }
 
@@ -112,6 +120,7 @@ public class MyProfileActivity extends AppCompatActivity
         tvMyEmail.setText(this.logged.getEmail());
 
         new SetImageTask(imgMyPortrait).execute(this.logged.getImgUrl());
+        new UserSubjectsTask(this, lvMySubjects).execute(this.logged.getUsername());
     }
 
     @Override
@@ -129,12 +138,22 @@ public class MyProfileActivity extends AppCompatActivity
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
                 break;
-            case R.id.bAddClass:
+            case R.id.bAddSubject:
                 //Add item to database and update the lvMyClasses
+                //Open dialog to enter subject name and tags
+                NewSubjectDialog d = new NewSubjectDialog();
+                d.setNewSubjectDialogListener(this);
+                FragmentManager fm = getFragmentManager();
+                d.show(fm, Constants.NEW_SUBJECT_DIALOG_TAG);
                 break;
             case R.id.bStartSearch:
                 //Begin store filters and open SearchResultsActivity
                 break;
         }
+    }
+
+    @Override
+    public void onPositiveClick(String name, String[] tags) {
+        new AddSubjectTask(this, lvMySubjects).execute(new Subject(0, this.logged.getUsername(), name, tags));
     }
 }
