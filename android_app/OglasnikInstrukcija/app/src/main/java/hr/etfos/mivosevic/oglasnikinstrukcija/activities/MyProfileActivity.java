@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -16,15 +17,22 @@ import hr.etfos.mivosevic.oglasnikinstrukcija.R;
 import hr.etfos.mivosevic.oglasnikinstrukcija.data.Subject;
 import hr.etfos.mivosevic.oglasnikinstrukcija.data.User;
 import hr.etfos.mivosevic.oglasnikinstrukcija.dialogs.NewSubjectDialog;
+import hr.etfos.mivosevic.oglasnikinstrukcija.dialogs.RemoveDialog;
 import hr.etfos.mivosevic.oglasnikinstrukcija.server.AddSubjectTask;
+import hr.etfos.mivosevic.oglasnikinstrukcija.server.EditSubjectTask;
+import hr.etfos.mivosevic.oglasnikinstrukcija.server.RemoveSubjectTask;
 import hr.etfos.mivosevic.oglasnikinstrukcija.server.SetImageTask;
 import hr.etfos.mivosevic.oglasnikinstrukcija.server.UserSubjectsTask;
 import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Constants;
 
 public class MyProfileActivity extends AppCompatActivity
-        implements View.OnClickListener,
-        NewSubjectDialog.NewSubjectDialogListener {
+    implements View.OnClickListener,
+        NewSubjectDialog.NewSubjectDialogListener,
+        AdapterView.OnItemClickListener,
+        AdapterView.OnItemLongClickListener,
+        RemoveDialog.RemoveDialogListener{
     private User logged;
+    private int currentSubjectPosition;
 
     private ImageView imgMyPortrait;
     private TextView tvMyName;
@@ -108,6 +116,8 @@ public class MyProfileActivity extends AppCompatActivity
         etSearchDistance = (EditText) findViewById(R.id.etSearchDistance);
         bStartSearch = (Button) findViewById(R.id.bStartSearch);
 
+        lvMySubjects.setOnItemLongClickListener(this);
+        lvMySubjects.setOnItemClickListener(this);
         bEditData.setOnClickListener(this);
         bLogout.setOnClickListener(this);
         bAddSubject.setOnClickListener(this);
@@ -152,8 +162,42 @@ public class MyProfileActivity extends AppCompatActivity
         }
     }
 
+    //Receive data from NewSubjectDialog and save it in database
     @Override
-    public void onPositiveClick(String name, String[] tags) {
-        new AddSubjectTask(this, lvMySubjects).execute(new Subject(0, this.logged.getUsername(), name, tags));
+    public void onPositiveClick(long id, String name, String[] tags) {
+        if (id == -1)
+            new AddSubjectTask(this, lvMySubjects).execute(new Subject(0, this.logged.getUsername(), name, tags));
+        else
+            new EditSubjectTask(this, lvMySubjects).execute(new Subject(id, this.logged.getUsername(), name, tags));
+    }
+
+    //Remove subject from database
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        this.currentSubjectPosition = position;
+
+        RemoveDialog d = new RemoveDialog();
+        d.setRemoveDialogListener(this);
+        FragmentManager fm = getFragmentManager();
+        d.show(fm, Constants.REMOVE_DIALOG_TAG);
+
+        return true;
+    }
+
+    @Override
+    public void onRemoveClick() {
+        new RemoveSubjectTask(this, lvMySubjects).execute((Subject) lvMySubjects.getAdapter().getItem(this.currentSubjectPosition));
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Bundle args = new Bundle();
+        args.putParcelable(Constants.SUBJECT_TAG, (Subject) parent.getAdapter().getItem(position));
+
+        NewSubjectDialog d = new NewSubjectDialog();
+        d.setArguments(args);
+        d.setNewSubjectDialogListener(this);
+        FragmentManager fm = getFragmentManager();
+        d.show(fm, Constants.NEW_SUBJECT_DIALOG_TAG);
     }
 }

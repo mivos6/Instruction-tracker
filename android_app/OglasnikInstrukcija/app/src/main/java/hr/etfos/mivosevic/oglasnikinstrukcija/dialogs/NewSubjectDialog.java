@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import hr.etfos.mivosevic.oglasnikinstrukcija.R;
+import hr.etfos.mivosevic.oglasnikinstrukcija.data.Subject;
 import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Constants;
 import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
 
@@ -22,15 +23,28 @@ public class NewSubjectDialog extends DialogFragment {
     private EditText etSubjectName;
     private EditText etSubjectTags;
 
+    private long id;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Subject s;
+        if (getArguments() != null && getArguments().containsKey(Constants.SUBJECT_TAG))
+            s = getArguments().getParcelable(Constants.SUBJECT_TAG);
+        else
+            s = new Subject(-1, "", "", null);
+
+        this.id = s.getId();
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View v = inflater.inflate(R.layout.new_subject_dialog_layout, null);
+        View v = inflater.inflate(R.layout.new_subject_dialog, null);
         builder.setView(v);
 
         etSubjectName = (EditText) v.findViewById(R.id.etSubjectName);
         etSubjectTags = (EditText) v.findViewById(R.id.etSubjectTags);
+
+        etSubjectName.setText(s.getName());
+        etSubjectTags.setText(Utility.convertTagsToString(s.getTags()));
 
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
@@ -42,7 +56,7 @@ public class NewSubjectDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (validataInput())
-                    listener.onPositiveClick(etSubjectName.getText().toString(), etSubjectTags.getText().toString().split(","));
+                    listener.onPositiveClick(id, etSubjectName.getText().toString(), etSubjectTags.getText().toString().split(","));
             }
         });
 
@@ -50,7 +64,7 @@ public class NewSubjectDialog extends DialogFragment {
     }
 
     public interface NewSubjectDialogListener {
-        void onPositiveClick(String name, String[] tags);
+        void onPositiveClick(long id,String name, String[] tags);
     }
 
     public void setNewSubjectDialogListener(NewSubjectDialogListener listener) {

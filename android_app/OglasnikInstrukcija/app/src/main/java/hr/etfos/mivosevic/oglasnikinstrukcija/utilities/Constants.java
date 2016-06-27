@@ -11,6 +11,8 @@ public class Constants {
     public static final String FILE_UPLOAD_SCRIPT = "file_upload.php";
     public static final String GET_USER_SUBJECTS_SCRIPT = "get_user_subjects.php";
     public static final String INSERT_SUBJECT_SCRIPT = "insert_subject.php";
+    public static final String REMOVE_SUBJECT_SCRIPT = "remove_subject.php";
+    public static final String UPDATE_SUBJECT_SCRIPT = "update_subject.php";
 
     public static final String USERNAME_DB_TAG = "username";
     public static final String PASSWORD_DB_TAG = "passw";
@@ -26,6 +28,7 @@ public class Constants {
     public static final String SUBJECT_TAGS_DB_TAG = "subject_tags";
 
     public static final String USER_TAG = "user";
+    public static final String SUBJECT_TAG = "subject";
 
     public static final String USERNAME_REGEX = "^(?=.{6,64}$)(?![.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![.])$";
     public static final String PASSWORD_REGEX = "^.*(?=.{6,})(?=.*[a-zA-Z\\d!#$%&?]).*$";
@@ -46,4 +49,5 @@ public class Constants {
     public static final String SUBJECT_TAGS_INVALID = "Nije uspjelo: Pogrešno navedene oznake\nPotrebno koristiti mala slova i odvajati zarezom";
 
     public static final String NEW_SUBJECT_DIALOG_TAG = "NewSubjectDialog";
+    public static final String REMOVE_DIALOG_TAG = "RemoveDialog";
 }

@@ -17,15 +17,15 @@ import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Constants;
 import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
 
 /**
- * Created by admin on 26.6.2016..
+ * Created by admin on 27.6.2016..
  */
-public class AddSubjectTask extends AsyncTask<Subject, Void, Boolean>{
+public class EditSubjectTask extends AsyncTask<Subject, Void, Boolean> {
     private Context context;
     private ListView lvMySubjects;
     private String errorMsg;
     private Subject subject;
 
-    public AddSubjectTask(Context c, ListView lv) {
+    public EditSubjectTask(Context c, ListView lv) {
         this.context = c;
         this.lvMySubjects = lv;
     }
@@ -37,12 +37,12 @@ public class AddSubjectTask extends AsyncTask<Subject, Void, Boolean>{
         String tagsString = Utility.convertTagsToString(this.subject.getTags());
 
         try {
-            URL link = new URL(Constants.SERVER_ADDRESS + Constants.INSERT_SUBJECT_SCRIPT);
+            URL link = new URL(Constants.SERVER_ADDRESS + Constants.UPDATE_SUBJECT_SCRIPT);
             HttpURLConnection conn = (HttpURLConnection) link.openConnection();
             conn.setDoOutput(true);
 
-            String data = URLEncoder.encode(Constants.USERNAME_DB_TAG, "UTF-8")
-                    + "=" + URLEncoder.encode(this.subject.getUsername(), "UTF-8")
+            String data = URLEncoder.encode(Constants.SUBJECT_ID_DB_TAG, "UTF-8")
+                    + "=" + URLEncoder.encode(Long.toString(this.subject.getId()), "UTF-8")
                     + "&" + URLEncoder.encode(Constants.SUBJECT_NAME_DB_TAG, "UTF-8")
                     + "=" + URLEncoder.encode(this.subject.getName(), "UTF-8")
                     + "&" + URLEncoder.encode(Constants.SUBJECT_TAGS_DB_TAG, "UTF-8")
@@ -63,8 +63,7 @@ public class AddSubjectTask extends AsyncTask<Subject, Void, Boolean>{
             }
             r.close();
             return result.equals("Success");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.d("MILAN", "Exception: " + e.getMessage());
             e.printStackTrace();
             return false;

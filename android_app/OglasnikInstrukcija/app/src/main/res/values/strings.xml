@@ -34,4 +34,10 @@
     <string name="refresh">Osvježi</string>
     <string name="results">Rezultati:</string>
     <string name="add_subject">Dodaj predmet</string>
+    <string name="subject_name">Ime predmeta</string>
+    <string name="subject_tags">Oznake</string>
+    <string name="remove_item">Brisanje stavke</string>
+    <string name="really_remove">Jeste li sigurni?</string>
+    <string name="no">Ne</string>
+    <string name="yes">Da</string>
 </resources>

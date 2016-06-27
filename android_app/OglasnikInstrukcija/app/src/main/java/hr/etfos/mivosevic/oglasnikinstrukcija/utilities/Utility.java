@@ -35,4 +35,17 @@ public class Utility {
         listView.setLayoutParams(params);
         listView.requestLayout();
     }
+
+    public static String convertTagsToString(String[] tags) {
+        if (tags == null)
+            return "";
+
+        String tagsString = "";
+        for (int i = 0; i < tags.length - 1; i++) {
+            tagsString += tags[i] + ",";
+        }
+        tagsString += tags[tags.length-1];
+
+        return tagsString;
+    }
 }

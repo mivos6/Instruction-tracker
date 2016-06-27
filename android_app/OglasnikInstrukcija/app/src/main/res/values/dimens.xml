@@ -17,7 +17,7 @@
     <dimen name="medium_text">18sp</dimen>
     <dimen name="medium_padding">25dp</dimen>
     <dimen name="large_text">24sp</dimen>
-    <dimen name="classes_width">250dp</dimen>
+    <dimen name="classes_width">300dp</dimen>
     <dimen name="classes_height">180dp</dimen>
     <dimen name="small_button_size">50dp</dimen>
     <dimen name="filter_input_size">200dp</dimen>

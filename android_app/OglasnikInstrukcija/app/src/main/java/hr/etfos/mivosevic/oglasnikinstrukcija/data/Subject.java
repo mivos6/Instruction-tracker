@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by admin on 26.6.2016..
  */
 public class Subject implements Parcelable{
-    private int id;
+    private long id;
     private String username;
     private String name;
     private String[] tags;
@@ -19,7 +19,7 @@ public class Subject implements Parcelable{
         this.tags = null;
     }
 
-    public Subject(int id, String username, String name, String[] tags) {
+    public Subject(long id, String username, String name, String[] tags) {
         this.id = id;
         this.username = username;
         this.name = name;
@@ -27,7 +27,7 @@ public class Subject implements Parcelable{
     }
 
     protected Subject(Parcel in) {
-        id = in.readInt();
+        id = in.readLong();
         username = in.readString();
         name = in.readString();
         tags = in.createStringArray();
@@ -45,7 +45,7 @@ public class Subject implements Parcelable{
         }
     };
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -61,7 +61,7 @@ public class Subject implements Parcelable{
         return tags;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -79,12 +79,12 @@ public class Subject implements Parcelable{
 
     @Override
     public int describeContents() {
-        return this.id;
+        return 0;
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
+        dest.writeLong(id);
         dest.writeString(username);
         dest.writeString(name);
         dest.writeStringArray(tags);

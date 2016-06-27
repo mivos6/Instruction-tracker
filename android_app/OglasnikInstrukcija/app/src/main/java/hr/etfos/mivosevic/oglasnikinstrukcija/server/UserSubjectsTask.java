@@ -3,7 +3,6 @@ package hr.etfos.mivosevic.oglasnikinstrukcija.server;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import org.json.JSONException;
@@ -17,6 +16,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
+import hr.etfos.mivosevic.oglasnikinstrukcija.adapters.SubjectAdapter;
 import hr.etfos.mivosevic.oglasnikinstrukcija.data.Subject;
 import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Constants;
 import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
@@ -97,10 +97,7 @@ public class UserSubjectsTask extends AsyncTask<String, Void, ArrayList<Subject>
         super.onPostExecute(subjects);
 
         if (subjects != null && !subjects.isEmpty()) {
-            lvMySubjects.setAdapter(new ArrayAdapter<Subject>(this.context,
-                    android.R.layout.simple_list_item_1,
-                    subjects
-            ));
+            lvMySubjects.setAdapter(new SubjectAdapter(subjects));
             Utility.setListViewHeightBasedOnChildren(lvMySubjects);
         }
         else {
