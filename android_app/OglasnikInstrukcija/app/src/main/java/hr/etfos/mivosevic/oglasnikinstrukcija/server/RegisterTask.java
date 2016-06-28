@@ -1,5 +1,6 @@
 package hr.etfos.mivosevic.oglasnikinstrukcija.server;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -24,12 +25,12 @@ import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
  * Created by admin on 22.6.2016..
  */
 public class RegisterTask extends AsyncTask<User, Void, Boolean> {
-    private Context context;
+    private Activity activity;
     private User logged;
     private String errorMsg = "Failed registration: ";
 
-    public RegisterTask(Context c) {
-        this.context = c;
+    public RegisterTask(Activity a) {
+        this.activity = a;
     }
 
     @Override
@@ -155,6 +156,7 @@ public class RegisterTask extends AsyncTask<User, Void, Boolean> {
             return false;
         }
 
+        this.logged.setImgUrl(serverFilePath);
         return true;
     }
 
@@ -162,17 +164,20 @@ public class RegisterTask extends AsyncTask<User, Void, Boolean> {
     protected void onPostExecute(Boolean result) {
         super.onPostExecute(result);
         if (result) {
-            Utility.displayToast(this.context, "Successful registration.", false);
+            Utility.displayToast(this.activity, "Successful registration.", false);
 
-            Intent i = new Intent(this.context, MyProfileActivity.class);
+            Log.d("MILAN", this.logged.getImgUrl());
+
+            Intent i = new Intent(this.activity, MyProfileActivity.class);
             i.putExtra(Constants.USER_TAG, this.logged);
-            this.context.startActivity(i);
+            this.activity.startActivity(i);
+            this.activity.finish();
         }
         else {
             if (errorMsg.contains("Duplicate entry")) {
                 errorMsg = "Failed registration: Username already exists";
             }
-            Utility.displayToast(this.context, errorMsg, false);
+            Utility.displayToast(this.activity, errorMsg, false);
         }
     }
 }

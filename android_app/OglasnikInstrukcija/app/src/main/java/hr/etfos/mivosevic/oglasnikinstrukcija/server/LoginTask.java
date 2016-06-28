@@ -1,5 +1,6 @@
 package hr.etfos.mivosevic.oglasnikinstrukcija.server;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -24,11 +25,11 @@ import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
  * Created by admin on 18.6.2016..
  */
 public class LoginTask extends AsyncTask<String, Void, User> {
-    private Context context;
+    private Activity activity;
     private String errorMsg = "Username and password combination does not exist.";
 
-    public LoginTask(Context c) {
-        this.context = c;
+    public LoginTask(Activity a) {
+        this.activity = a;
     }
 
     @Override
@@ -102,14 +103,15 @@ public class LoginTask extends AsyncTask<String, Void, User> {
     protected void onPostExecute(User user) {
         super.onPostExecute(user);
         if (user == null) {
-            Utility.displayToast(this.context, errorMsg, false);
+            Utility.displayToast(this.activity, errorMsg, false);
             return;
         }
 
-        Utility.displayToast(this.context, "Successful login: " + user.getUsername(), false);
-        Intent i = new Intent(this.context, MyProfileActivity.class);
+        Utility.displayToast(this.activity, "Successful login: " + user.getUsername(), false);
+        Intent i = new Intent(this.activity, MyProfileActivity.class);
         i.putExtra(Constants.USER_TAG, user);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        this.context.startActivity(i);
+        this.activity.startActivity(i);
+        this.activity.finish();
     }
 }

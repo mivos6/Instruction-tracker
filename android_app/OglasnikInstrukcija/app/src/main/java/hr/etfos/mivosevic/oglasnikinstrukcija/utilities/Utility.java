@@ -1,6 +1,10 @@
 package hr.etfos.mivosevic.oglasnikinstrukcija.utilities;
 
 import android.content.Context;
+import android.content.CursorLoader;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -47,5 +51,19 @@ public class Utility {
         tagsString += tags[tags.length-1];
 
         return tagsString;
+    }
+
+    public static String getPathFromUri(Context c, Uri data) {
+        String result;
+
+        String[] projection = {MediaStore.Images.Media.DATA};
+        CursorLoader loader = new CursorLoader(c, data, projection, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        result = cursor.getString(columnIndex);
+        cursor.close();
+
+        return result;
     }
 }

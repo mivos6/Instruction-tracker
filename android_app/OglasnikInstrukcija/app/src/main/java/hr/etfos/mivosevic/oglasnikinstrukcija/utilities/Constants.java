@@ -13,6 +13,7 @@ public class Constants {
     public static final String INSERT_SUBJECT_SCRIPT = "insert_subject.php";
     public static final String REMOVE_SUBJECT_SCRIPT = "remove_subject.php";
     public static final String UPDATE_SUBJECT_SCRIPT = "update_subject.php";
+    public static final String UPDATE_USER_SCRIPT = "update_user.php";
 
     public static final String USERNAME_DB_TAG = "username";
     public static final String PASSWORD_DB_TAG = "passw";
@@ -46,8 +47,10 @@ public class Constants {
     public static final int SELECT_IMAGE_CODE = 123;
 
     public static final String SUBJECT_NAME_INVALID = "Nije uspjelo: Pogršeno upisano ime predmeta";
-    public static final String SUBJECT_TAGS_INVALID = "Nije uspjelo: Pogrešno navedene oznake\nPotrebno koristiti mala slova i odvajati zarezom";
+    public static final String SUBJECT_TAGS_INVALID = "Nije uspjelo: Pogrešno navedene oznake\nSadrže slova, brojke i znakove: .#$%&+-\nOdvojeni su zarezom";
 
     public static final String NEW_SUBJECT_DIALOG_TAG = "NewSubjectDialog";
     public static final String REMOVE_DIALOG_TAG = "RemoveDialog";
+
+    public static final String OLD_USERNAME_TAG = "old_username";
 }

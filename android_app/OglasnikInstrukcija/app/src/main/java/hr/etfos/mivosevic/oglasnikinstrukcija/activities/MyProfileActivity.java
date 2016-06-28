@@ -135,18 +135,23 @@ public class MyProfileActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v) {
+        Intent i;
+
         switch (v.getId()) {
             case R.id.bEditData:
                 //Open RegisterActivity to edit user data
+                i = new Intent(this, RegisterActivity.class);
+                i.putExtra(Constants.USER_TAG, this.logged);
+                startActivity(i);
                 break;
             case R.id.bLogout:
                 //Clear user data from shared prefs fila and switch to LoginActivity
                 SharedPreferences.Editor e = getSharedPreferences(Constants.USER_PREFS_FILE, 0).edit();
                 e.clear();
                 e.commit();
-                Intent i = new Intent(this, LoginActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                i = new Intent(this, LoginActivity.class);
                 startActivity(i);
+                this.finish();
                 break;
             case R.id.bAddSubject:
                 //Add item to database and update the lvMyClasses

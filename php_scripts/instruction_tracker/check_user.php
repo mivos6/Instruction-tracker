@@ -15,6 +15,7 @@
 	
 	$row = mysqli_fetch_array($result);
 	if ($row) {
+		$row["passw"] = $_POST["passw"];
 		echo "Success\n";
 		echo json_encode($row);
 	}

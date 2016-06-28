@@ -1,13 +1,8 @@
 package hr.etfos.mivosevic.oglasnikinstrukcija.activities;
 
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,18 +13,21 @@ import android.widget.ImageView;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.URL;
 
 import hr.etfos.mivosevic.oglasnikinstrukcija.R;
 import hr.etfos.mivosevic.oglasnikinstrukcija.data.User;
+import hr.etfos.mivosevic.oglasnikinstrukcija.server.EditUserTask;
 import hr.etfos.mivosevic.oglasnikinstrukcija.server.RegisterTask;
+import hr.etfos.mivosevic.oglasnikinstrukcija.server.SetImageTask;
 import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Constants;
 import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
 
 public class RegisterActivity extends AppCompatActivity
-        implements View.OnClickListener {
+    implements View.OnClickListener {
     private ImageView imgSignupPortrait;
-    private String imagePath =  null; //Environment.getExternalStorageDirectory().getPath() + "/Download/icon-user-default.png";
+    private String imagePath =  null;
+    private boolean update = false;
+    private User oldData;
 
     private EditText etName;
     private EditText etUsername;
@@ -53,6 +51,7 @@ public class RegisterActivity extends AppCompatActivity
         setContentView(R.layout.activity_register);
 
         initialize();
+        setData();
     }
 
     private void initialize() {
@@ -81,6 +80,39 @@ public class RegisterActivity extends AppCompatActivity
         imgSignupPortrait.setOnClickListener(this);
     }
 
+    private void setData() {
+        if (getIntent().hasExtra(Constants.USER_TAG)) {
+            this.oldData = getIntent().getParcelableExtra(Constants.USER_TAG);
+            imagePath = this.oldData.getImgUrl();
+            update = true;
+        }
+        else {
+            this.oldData = new User();
+            update = false;
+        }
+
+        String[] location;
+        if (oldData.getLocation() != null)
+            location = oldData.getLocation().split("\n");
+        else
+            location = new String[]{"", "", ""};
+
+        etName.setText(this.oldData.getName());
+        etUsername.setText(this.oldData.getUsername());
+        etPassword.setText(this.oldData.getPassword());
+        etRepeatPassword.setText(this.oldData.getPassword());
+        etEmail.setText(this.oldData.getEmail());
+        etPhone.setText(this.oldData.getPhoneNumber());
+        etTown.setText(location[0]);
+        etStreet.setText(location[1]);
+        etNumber.setText(location[2]);
+        etAbout.setText(this.oldData.getAbout());
+
+        if (oldData.getImgUrl() != null && !oldData.getImgUrl().equals("")) {
+            new SetImageTask(imgSignupPortrait).execute(oldData.getImgUrl());
+        }
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -91,16 +123,28 @@ public class RegisterActivity extends AppCompatActivity
                             + etStreet.getText().toString() + "\n"
                             + etNumber.getText().toString();
 
-                    RegisterTask rt = new RegisterTask(this);
-                    rt.execute(new User(etUsername.getText().toString(),
-                            etPassword.getText().toString(),
-                            etName.getText().toString(),
-                            etEmail.getText().toString(),
-                            etPhone.getText().toString(),
-                            location,
-                            etAbout.getText().toString(),
-                            imagePath
-                    ));
+                    if (!update) {
+                        new RegisterTask(this).execute(new User(etUsername.getText().toString(),
+                                etPassword.getText().toString(),
+                                etName.getText().toString(),
+                                etEmail.getText().toString(),
+                                etPhone.getText().toString(),
+                                location,
+                                etAbout.getText().toString(),
+                                imagePath
+                        ));
+                    }
+                    else {
+                        new EditUserTask(this, this.oldData.getUsername()).execute(new User(etUsername.getText().toString(),
+                                etPassword.getText().toString(),
+                                etName.getText().toString(),
+                                etEmail.getText().toString(),
+                                etPhone.getText().toString(),
+                                location,
+                                etAbout.getText().toString(),
+                                imagePath
+                        ));
+                    }
                 }
                 break;
             case R.id.bCancel:
@@ -178,27 +222,13 @@ public class RegisterActivity extends AppCompatActivity
                     bmpOpt.inSampleSize = 4;
                     imgSignupPortrait.setImageBitmap(BitmapFactory.decodeStream(is, null, bmpOpt));
 
-                    //Get absolutr path from Uri
-                    this.imagePath = getPathFromUri(imageUri);
+                    //Get absolute path from Uri
+                    this.imagePath = Utility.getPathFromUri(this, imageUri);
                 } catch (FileNotFoundException e) {
                     Log.d("MILAN", e.getMessage());
                     e.printStackTrace();
                 }
             }
         }
-    }
-
-    private String getPathFromUri(Uri data) {
-        String result;
-
-        String[] projection = {MediaStore.Images.Media.DATA};
-        CursorLoader loader = new CursorLoader(this, data, projection, null, null, null);
-        Cursor cursor = loader.loadInBackground();
-        int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        result = cursor.getString(columnIndex);
-        cursor.close();
-
-        return result;
     }
 }
