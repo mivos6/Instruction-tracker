@@ -153,8 +153,8 @@ public class EditUserTask extends AsyncTask<User, Void, Boolean> {
                     errorMsg += line + "\n";
                 }
                 r.close();
+
                 if (!result.equals("Success")) return false;
-                Log.d("MILAN", "upload success");
             }
         }
         catch (Exception e) {

@@ -4,7 +4,7 @@ package hr.etfos.mivosevic.oglasnikinstrukcija.utilities;
  * Created by admin on 18.6.2016..
  */
 public class Constants {
-    public static final String SERVER_ADDRESS = "http://10.0.3.2/instruction_tracker/";
+    public static final String SERVER_ADDRESS = "http://instructortracker-mivos6.rhcloud.com/";
     public static final String SERVER_UPLOAD_DIR = "Uploads/";
     public static final String CHECK_USER_SCRIPT = "check_user.php";
     public static final String INSERT_USER_SCRIPT = "insert_user.php";
@@ -14,6 +14,7 @@ public class Constants {
     public static final String REMOVE_SUBJECT_SCRIPT = "remove_subject.php";
     public static final String UPDATE_SUBJECT_SCRIPT = "update_subject.php";
     public static final String UPDATE_USER_SCRIPT = "update_user.php";
+    public static final String SEARCH_SCRIPT = "search.php";
 
     public static final String USERNAME_DB_TAG = "username";
     public static final String PASSWORD_DB_TAG = "passw";
@@ -41,6 +42,7 @@ public class Constants {
     public static final String PHONE_NOT_VALID = "Pogrešno unesen broj telefona.";
     public static final String ADDRESS_NOT_VALID = "Pogrešno unesena adresa.";
     public static final String PASSWORD_NOT_MATCH = "Unesene lozinke se ne podudaraju.";
+    public static final String TOWN_NOT_VALID = "Pogrešno uneseno ime grada.";
 
     public static final String USER_PREFS_FILE = "userPrefs";
 
@@ -53,4 +55,12 @@ public class Constants {
     public static final String REMOVE_DIALOG_TAG = "RemoveDialog";
 
     public static final String OLD_USERNAME_TAG = "old_username";
+    public static final String FILTERS_TAG = "filters";
+
+    public static final String LOCATION_TAG = "location";
+    public static final String NO_LOCATION = "Nije dopušten pristup lokaciji";
+    public static final int MIN_TIME = 3600000;
+    public static final int MIN_DIST = 1000;
+    public static final String NO_GEOCODER = "Ne postoji geokoder";
+    public static final String NO_LOCATION_FOUND = "Nije pronađena ni jedna lokacija";
 }

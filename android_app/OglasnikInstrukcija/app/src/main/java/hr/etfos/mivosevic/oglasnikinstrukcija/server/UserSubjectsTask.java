@@ -101,7 +101,7 @@ public class UserSubjectsTask extends AsyncTask<String, Void, ArrayList<Subject>
             Utility.setListViewHeightBasedOnChildren(lvMySubjects);
         }
         else {
-            Log.d("MILAN", this.errorMsg);
+            Log.d("MILAN", "Error: " + this.errorMsg);
             Utility.displayToast(this.context, this.errorMsg, true);
         }
     }

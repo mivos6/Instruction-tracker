@@ -40,4 +40,9 @@
     <string name="really_remove">Jeste li sigurni?</string>
     <string name="no">Ne</string>
     <string name="yes">Da</string>
+    <string name="show_on_map">Prikaži na mapi</string>
+    <string name="subjects">Predmeti</string>
+    <string name="email">Email</string>
+    <string name="sms">SMS</string>
+    <string name="call">Poziv</string>
 </resources>

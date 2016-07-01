@@ -68,28 +68,34 @@
             android:layout_toRightOf="@id/bEditData" />
 
         <TextView
-            android:id="@+id/tvClassesHeading"
+            android:id="@+id/tvSubjectsHeading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/my_classes"
             android:textSize="@dimen/large_text"
             android:layout_below="@id/bEditData"/>
 
-        <ListView
-            android:id="@+id/lvMySubjects"
-            android:layout_width="@dimen/classes_width"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tvClassesHeading">
-        </ListView>
+            android:orientation="vertical"
+            android:layout_below="@id/tvSubjectsHeading">
 
-        <Button
-            android:id="@+id/bAddSubject"
-            android:layout_width="@dimen/small_button_size"
-            android:layout_height="@dimen/small_button_size"
-            android:text="@string/add_class"
-            android:layout_alignTop="@id/lvMySubjects"
-            android:layout_toRightOf="@id/lvMySubjects"
-            android:layout_marginLeft="@dimen/small_padding"/>
+            <ListView
+                android:id="@+id/lvMySubjects"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </ListView>
+
+            <Button
+                android:id="@+id/bAddSubject"
+                android:layout_width="@dimen/small_button_size"
+                android:layout_height="@dimen/small_button_size"
+                android:text="@string/add_class"
+                android:layout_gravity="right"
+                android:layout_marginRight="@dimen/small_padding"/>
+        </LinearLayout>
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -120,14 +126,6 @@
             android:layout_alignParentRight="true"
             android:layout_below="@id/etSearchSubject"/>
 
-        <EditText
-            android:id="@+id/etSearchDistance"
-            android:layout_width="@dimen/filter_input_size"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/etSearchTown"/>
-
         <TextView
             android:id="@+id/tvSearchSubject"
             android:layout_width="wrap_content"
@@ -144,14 +142,6 @@
             android:textSize="@dimen/medium_text"
             android:layout_alignBaseline="@id/etSearchTown" />
 
-        <TextView
-            android:id="@+id/tvSearchDistance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/by_distance"
-            android:textSize="@dimen/medium_text"
-            android:layout_alignBaseline="@id/etSearchDistance"/>
-
         <Button
             android:id="@+id/bStartSearch"
             android:layout_width="wrap_content"
@@ -159,7 +149,7 @@
             android:text="@string/start_search"
             android:layout_alignParentRight="true"
             android:layout_marginRight="@dimen/medium_padding"
-            android:layout_below="@id/etSearchDistance"/>
+            android:layout_below="@id/etSearchTown"/>
     </RelativeLayout>
 </LinearLayout>
 </ScrollView>

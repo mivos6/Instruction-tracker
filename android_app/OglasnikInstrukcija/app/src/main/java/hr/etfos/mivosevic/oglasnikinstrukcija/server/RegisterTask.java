@@ -147,6 +147,7 @@ public class RegisterTask extends AsyncTask<User, Void, Boolean> {
                     errorMsg += line + "\n";
                 }
                 r.close();
+
                 if (!result.equals("Success")) return false;
             }
         }

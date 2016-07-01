@@ -72,11 +72,11 @@ public class NewSubjectDialog extends DialogFragment {
     }
 
     private boolean validataInput() {
-        if (!etSubjectName.getText().toString().matches("^[a-zA-Z0-9 ,.'-]+$")) {
+        if (!etSubjectName.getText().toString().matches("^[\\w0-9 ,.#$%&+-]+$")) {
             Utility.displayToast(NewSubjectDialog.this.getActivity(), Constants.SUBJECT_NAME_INVALID, true);
             return false;
         }
-        if (!etSubjectTags.getText().toString().matches("^[a-zA-Z0-9 ,.#$%&+-]+$")) {
+        if (!etSubjectTags.getText().toString().matches("^[\\w0-9 ,.#$%&+-]+$")) {
             Utility.displayToast(NewSubjectDialog.this.getActivity(), Constants.SUBJECT_TAGS_INVALID, true);
             return false;
         }

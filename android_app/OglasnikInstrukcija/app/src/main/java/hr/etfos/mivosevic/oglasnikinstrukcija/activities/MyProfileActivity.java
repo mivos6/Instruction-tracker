@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import hr.etfos.mivosevic.oglasnikinstrukcija.R;
 import hr.etfos.mivosevic.oglasnikinstrukcija.data.Subject;
 import hr.etfos.mivosevic.oglasnikinstrukcija.data.User;
@@ -24,6 +26,7 @@ import hr.etfos.mivosevic.oglasnikinstrukcija.server.RemoveSubjectTask;
 import hr.etfos.mivosevic.oglasnikinstrukcija.server.SetImageTask;
 import hr.etfos.mivosevic.oglasnikinstrukcija.server.UserSubjectsTask;
 import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Constants;
+import hr.etfos.mivosevic.oglasnikinstrukcija.utilities.Utility;
 
 public class MyProfileActivity extends AppCompatActivity
     implements View.OnClickListener,
@@ -46,7 +49,6 @@ public class MyProfileActivity extends AppCompatActivity
 
     private EditText etSearchSubject;
     private EditText etSearchTown;
-    private EditText etSearchDistance;
     private Button bStartSearch;
 
     @Override
@@ -113,7 +115,6 @@ public class MyProfileActivity extends AppCompatActivity
         bAddSubject = (Button) findViewById(R.id.bAddSubject);
         etSearchSubject = (EditText) findViewById(R.id.etSearchSubject);
         etSearchTown = (EditText) findViewById(R.id.etSearchTown);
-        etSearchDistance = (EditText) findViewById(R.id.etSearchDistance);
         bStartSearch = (Button) findViewById(R.id.bStartSearch);
 
         lvMySubjects.setOnItemLongClickListener(this);
@@ -150,6 +151,7 @@ public class MyProfileActivity extends AppCompatActivity
                 e.clear();
                 e.commit();
                 i = new Intent(this, LoginActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
                 this.finish();
                 break;
@@ -162,7 +164,8 @@ public class MyProfileActivity extends AppCompatActivity
                 d.show(fm, Constants.NEW_SUBJECT_DIALOG_TAG);
                 break;
             case R.id.bStartSearch:
-                //Begin store filters and open SearchResultsActivity
+                //Store filters and open SearchResultsActivity
+                startSearch();
                 break;
         }
     }
@@ -204,5 +207,30 @@ public class MyProfileActivity extends AppCompatActivity
         d.setNewSubjectDialogListener(this);
         FragmentManager fm = getFragmentManager();
         d.show(fm, Constants.NEW_SUBJECT_DIALOG_TAG);
+    }
+
+    private void startSearch() {
+        ArrayList<String> filters = new ArrayList<String>();
+
+        if (etSearchSubject.getText().toString().matches("^[\\w0-9 ,.#$%&+-]+$")
+                || etSearchSubject.getText().toString().equals("")) {
+            filters.add(0, etSearchSubject.getText().toString());
+        }
+        else {
+            Utility.displayToast(this, Constants.SUBJECT_NAME_INVALID, false);
+            return;
+        }
+        if (etSearchTown.getText().toString().matches("^[\\w ,.'-]+$")
+                || etSearchTown.getText().toString().equals("")) {
+            filters.add(1, etSearchTown.getText().toString());
+        }
+        else {
+            Utility.displayToast(this, Constants.TOWN_NOT_VALID, false);
+            return;
+        }
+
+        Intent i = new Intent(this, SearchResultsActivity.class);
+        i.putStringArrayListExtra(Constants.FILTERS_TAG, filters);
+        startActivity(i);
     }
 }

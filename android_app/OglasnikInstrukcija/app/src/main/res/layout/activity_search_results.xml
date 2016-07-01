@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
-<LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -26,7 +23,7 @@
             android:layout_marginBottom="@dimen/small_padding" />
 
         <EditText
-            android:id="@+id/etFilterClass"
+            android:id="@+id/etFilterSubject"
             android:layout_width="@dimen/filter_input_size"
             android:layout_height="wrap_content"
             android:inputType="text"
@@ -39,23 +36,15 @@
             android:layout_height="wrap_content"
             android:inputType="text"
             android:layout_alignParentRight="true"
-            android:layout_below="@id/etFilterClass"/>
-
-        <EditText
-            android:id="@+id/etFilterDistance"
-            android:layout_width="@dimen/filter_input_size"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/etFilterTown"/>
+            android:layout_below="@id/etFilterSubject"/>
 
         <TextView
-            android:id="@+id/tvFilterClass"
+            android:id="@+id/tvFilterSubject"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/by_class"
             android:textSize="@dimen/medium_text"
-            android:layout_alignBaseline="@id/etFilterClass"/>
+            android:layout_alignBaseline="@id/etFilterSubject"/>
 
         <TextView
             android:id="@+id/tvFilterTown"
@@ -65,14 +54,6 @@
             android:textSize="@dimen/medium_text"
             android:layout_alignBaseline="@id/etFilterTown" />
 
-        <TextView
-            android:id="@+id/tvFilterDistance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/by_distance"
-            android:textSize="@dimen/medium_text"
-            android:layout_alignBaseline="@id/etFilterDistance"/>
-
         <Button
             android:id="@+id/bRefreshFilter"
             android:layout_width="wrap_content"
@@ -80,7 +61,7 @@
             android:text="@string/refresh"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="@dimen/medium_padding"
-            android:layout_below="@id/etFilterDistance"/>
+            android:layout_below="@id/etFilterTown"/>
     </RelativeLayout>
 
     <RelativeLayout
@@ -98,9 +79,16 @@
         <ListView
             android:id="@+id/lvSearchResults"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/classes_height"
             android:layout_below="@id/tvResultsHeading">
         </ListView>
     </RelativeLayout>
+
+    <Button
+        android:id="@+id/bShowOnMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="@dimen/medium_padding"
+        android:text="@string/show_on_map" />
 </LinearLayout>
-</ScrollView>

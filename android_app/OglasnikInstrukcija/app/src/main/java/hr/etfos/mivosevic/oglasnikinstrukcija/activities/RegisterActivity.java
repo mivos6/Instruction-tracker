@@ -1,8 +1,11 @@
 package hr.etfos.mivosevic.oglasnikinstrukcija.activities;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,8 +16,10 @@ import android.widget.ImageView;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import hr.etfos.mivosevic.oglasnikinstrukcija.R;
+import hr.etfos.mivosevic.oglasnikinstrukcija.services.MyLocation;
 import hr.etfos.mivosevic.oglasnikinstrukcija.data.User;
 import hr.etfos.mivosevic.oglasnikinstrukcija.server.EditUserTask;
 import hr.etfos.mivosevic.oglasnikinstrukcija.server.RegisterTask;
@@ -29,6 +34,18 @@ public class RegisterActivity extends AppCompatActivity
     private boolean update = false;
     private User oldData;
 
+    private MyLocation myLocService;
+    public ServiceConnection myLocServiceConn = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MyLocation.MyLocationBinder b = (MyLocation.MyLocationBinder) service;
+            myLocService = b.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {}
+    };
+
     private EditText etName;
     private EditText etUsername;
     private EditText etPassword;
@@ -41,7 +58,6 @@ public class RegisterActivity extends AppCompatActivity
     private EditText etAbout;
 
     private Button bCurrentLocation;
-    private Button bMap;
     private Button bCancel;
     private Button bConfirm;
 
@@ -69,15 +85,16 @@ public class RegisterActivity extends AppCompatActivity
         etNumber = (EditText) findViewById(R.id.etNumber);
         etAbout = (EditText) findViewById(R.id.etAbout);
         bCurrentLocation = (Button) findViewById(R.id.bCurrentLocation);
-        bMap = (Button) findViewById(R.id.bMap);
         bCancel = (Button) findViewById(R.id.bCancel);
         bConfirm = (Button) findViewById(R.id.bConfirm);
 
         bConfirm.setOnClickListener(this);
         bCancel.setOnClickListener(this);
         bCurrentLocation.setOnClickListener(this);
-        bMap.setOnClickListener(this);
         imgSignupPortrait.setOnClickListener(this);
+
+        Intent i = new Intent(this, MyLocation.class);
+        bindService(i, this.myLocServiceConn, BIND_AUTO_CREATE);
     }
 
     private void setData() {
@@ -153,9 +170,14 @@ public class RegisterActivity extends AppCompatActivity
                 break;
             case R.id.bCurrentLocation:
                 //Get location from location service
-                break;
-            case R.id.bMap:
-                //Open Google Map and get location from map marker
+                if (this.myLocService != null) {
+                    ArrayList<String> curLoc = this.myLocService.getCurrentLocation();
+                    if (!curLoc.isEmpty()) {
+                        etTown.setText(curLoc.get(0));
+                        etStreet.setText(curLoc.get(1));
+                        etNumber.setText(curLoc.get(2));
+                    }
+                }
                 break;
             case R.id.imgSignupPortrait:
                 //Launch galery to select image
@@ -196,8 +218,8 @@ public class RegisterActivity extends AppCompatActivity
             }
         }
         //Check town name, street name and number
-        if (!(etTown.getText().toString().matches("^[a-zA-Z ,.'-]+$")
-            && etStreet.getText().toString().matches("^[a-zA-Z ,.'-]+$")
+        if (!(etTown.getText().toString().matches("^[\\w ,.'-]+$")
+            && etStreet.getText().toString().matches("^[\\w ,.'-]+$")
             && etNumber.getText().toString().matches("^[\\d]+$"))) {
             Utility.displayToast(this, Constants.ADDRESS_NOT_VALID, false);
             return false;
@@ -230,5 +252,11 @@ public class RegisterActivity extends AppCompatActivity
                 }
             }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unbindService(this.myLocServiceConn);
     }
 }
