@@ -94,7 +94,7 @@ public class RegisterActivity extends AppCompatActivity
         imgSignupPortrait.setOnClickListener(this);
 
         Intent i = new Intent(this, MyLocation.class);
-        bindService(i, this.myLocServiceConn, BIND_AUTO_CREATE);
+        bindService(i, this.myLocServiceConn, 0);
     }
 
     private void setData() {
@@ -255,8 +255,8 @@ public class RegisterActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         unbindService(this.myLocServiceConn);
     }
 }

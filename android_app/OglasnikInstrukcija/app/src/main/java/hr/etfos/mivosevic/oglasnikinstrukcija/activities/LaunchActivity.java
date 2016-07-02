@@ -1,7 +1,10 @@
 package hr.etfos.mivosevic.oglasnikinstrukcija.activities;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -15,6 +18,12 @@ public class LaunchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         launchApp();
+        startLocationService();
+    }
+
+    private void startLocationService() {
+        Intent i = new Intent(this, MyLocation.class);
+        startService(i);
     }
 
     @Override

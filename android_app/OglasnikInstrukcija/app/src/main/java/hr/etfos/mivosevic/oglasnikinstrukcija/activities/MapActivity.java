@@ -40,6 +40,7 @@ public class MapActivity extends AppCompatActivity
 
     private ArrayList<User> users;
 
+    private boolean curLocMarkerSet = false;
     private MyLocation myLocService;
     public ServiceConnection myLocServiceConn = new ServiceConnection() {
         @Override
@@ -47,7 +48,9 @@ public class MapActivity extends AppCompatActivity
             MyLocation.MyLocationBinder b = (MyLocation.MyLocationBinder) service;
             myLocService = b.getService();
 
-            setMyMarker();
+            if (googleMap != null && !curLocMarkerSet) {
+                setMyMarker();
+            }
         }
 
         @Override
@@ -63,9 +66,6 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void initialize() {
-        Intent i = new Intent(this, MyLocation.class);
-        bindService(i, this.myLocServiceConn, BIND_AUTO_CREATE);
-
         if (getIntent().hasExtra(Constants.USER_TAG))
             users = getIntent().getParcelableArrayListExtra(Constants.USER_TAG);
         if (Geocoder.isPresent())
@@ -97,6 +97,10 @@ public class MapActivity extends AppCompatActivity
         }
 
         setUserMarkers(userPositions);
+
+        if (this.myLocService != null && !this.curLocMarkerSet) {
+            setMyMarker();
+        }
     }
 
     private ArrayList<LatLng> getUserPositions() {
@@ -154,6 +158,7 @@ public class MapActivity extends AppCompatActivity
         opts.position(curPos)
                 .title("Vaša lokacija");
         this.googleMap.addMarker(opts);
+        this.curLocMarkerSet = true;
     }
 
     @Override
@@ -176,8 +181,15 @@ public class MapActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onResume() {
+        super.onResume();
+        Intent i = new Intent(this, MyLocation.class);
+        bindService(i, this.myLocServiceConn, 0);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
         unbindService(this.myLocServiceConn);
     }
 }
