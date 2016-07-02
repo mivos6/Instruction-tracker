@@ -12,11 +12,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -39,6 +42,7 @@ public class MapActivity extends AppCompatActivity
     private Geocoder geocoder;
 
     private ArrayList<User> users;
+    private ArrayList<Marker> markers;
 
     private boolean curLocMarkerSet = false;
     private MyLocation myLocService;
@@ -74,6 +78,8 @@ public class MapActivity extends AppCompatActivity
         FragmentManager fm = getFragmentManager();
         this.mapFragment = (MapFragment) fm.findFragmentById(R.id.map);
         this.mapFragment.getMapAsync(this);
+
+        this.markers = new ArrayList<Marker>();
     }
 
     @Override
@@ -101,6 +107,8 @@ public class MapActivity extends AppCompatActivity
         if (this.myLocService != null && !this.curLocMarkerSet) {
             setMyMarker();
         }
+
+        zoomToMarkers();
     }
 
     private ArrayList<LatLng> getUserPositions() {
@@ -128,9 +136,11 @@ public class MapActivity extends AppCompatActivity
                 opts.position(userPositions.get(i))
                         .title(users.get(i).getUsername())
                         .snippet(users.get(i).getLocation().replace('\n', ','));
-                this.googleMap.addMarker(opts);
+                Marker m = this.googleMap.addMarker(opts);
 
                 googleMap.setOnInfoWindowClickListener(this);
+
+                this.markers.add(m);
             }
         }
     }
@@ -157,8 +167,10 @@ public class MapActivity extends AppCompatActivity
         MarkerOptions opts = new MarkerOptions();
         opts.position(curPos)
                 .title("Vaša lokacija");
-        this.googleMap.addMarker(opts);
+        Marker myMarker = this.googleMap.addMarker(opts);
         this.curLocMarkerSet = true;
+
+        this.markers.add(myMarker);
     }
 
     @Override
@@ -179,6 +191,21 @@ public class MapActivity extends AppCompatActivity
             startActivity(i);
         }
     }
+
+    private void zoomToMarkers() {
+        LatLngBounds.Builder b = new LatLngBounds.Builder();
+        for (int i = 0; i < this.markers.size(); i++) {
+            b.include(this.markers.get(i).getPosition());
+        }
+
+        LatLngBounds bounds = b.build();
+
+        int padding = 20;
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+        googleMap.animateCamera(cu);
+    }
+
 
     @Override
     protected void onResume() {

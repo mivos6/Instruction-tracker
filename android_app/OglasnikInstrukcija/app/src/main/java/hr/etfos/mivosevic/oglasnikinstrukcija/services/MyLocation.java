@@ -97,6 +97,9 @@ public class MyLocation extends Service
             return currentLoc;
         }
         this.location = locationManager.getLastKnownLocation(provider);
+        if (location == null) {
+            return currentLoc;
+        }
 
         if (this.geocoder != null) {
             Log.d("MILAN", "geocoder");
