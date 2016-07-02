@@ -46,6 +46,7 @@ public class MapActivity extends AppCompatActivity
 
     private boolean curLocMarkerSet = false;
     private MyLocation myLocService;
+    private boolean isBound = false;
     public ServiceConnection myLocServiceConn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -54,6 +55,7 @@ public class MapActivity extends AppCompatActivity
 
             if (googleMap != null && !curLocMarkerSet) {
                 setMyMarker();
+                zoomToMarkers();
             }
         }
 
@@ -106,9 +108,8 @@ public class MapActivity extends AppCompatActivity
 
         if (this.myLocService != null && !this.curLocMarkerSet) {
             setMyMarker();
+            zoomToMarkers();
         }
-
-        zoomToMarkers();
     }
 
     private ArrayList<LatLng> getUserPositions() {
@@ -211,12 +212,15 @@ public class MapActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         Intent i = new Intent(this, MyLocation.class);
-        bindService(i, this.myLocServiceConn, 0);
+        this.isBound = bindService(i, this.myLocServiceConn, 0);
     }
 
     @Override
     protected void onStop() {
+        if (this.isBound) {
+            unbindService(this.myLocServiceConn);
+            this.isBound = false;
+        }
         super.onStop();
-        unbindService(this.myLocServiceConn);
     }
 }

@@ -35,6 +35,7 @@ public class RegisterActivity extends AppCompatActivity
     private User oldData;
 
     private MyLocation myLocService;
+    private boolean isBound = false;
     public ServiceConnection myLocServiceConn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -94,7 +95,7 @@ public class RegisterActivity extends AppCompatActivity
         imgSignupPortrait.setOnClickListener(this);
 
         Intent i = new Intent(this, MyLocation.class);
-        bindService(i, this.myLocServiceConn, 0);
+        this.isBound = bindService(i, this.myLocServiceConn, 0);
     }
 
     private void setData() {
@@ -256,7 +257,10 @@ public class RegisterActivity extends AppCompatActivity
 
     @Override
     protected void onStop() {
+        if (this.isBound) {
+            unbindService(this.myLocServiceConn);
+            this.isBound = false;
+        }
         super.onStop();
-        unbindService(this.myLocServiceConn);
     }
 }
