@@ -194,6 +194,9 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void zoomToMarkers() {
+        if (markers.isEmpty())
+            return;
+
         LatLngBounds.Builder b = new LatLngBounds.Builder();
         for (int i = 0; i < this.markers.size(); i++) {
             b.include(this.markers.get(i).getPosition());

@@ -111,6 +111,7 @@ public class SearchResultsActivity extends AppCompatActivity
         }
 
 
+        foundUsers.clear();
         new SearchTask(lvSearchResults, foundUsers, this).execute(filters.get(0), filters.get(1));
     }
 }
