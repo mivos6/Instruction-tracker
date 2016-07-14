@@ -4,13 +4,28 @@
 	<title>Oglanik instrukcija</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-
+	<!--jQuery-->
 	<script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
-
+	<!--Bootstrap css-->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<!--Bootstrap js-->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
+	<script type="text/javascript" src="common.js"></script>
+
 	<style type="text/css">
+		.affix {
+	        top:0;
+	        width: 100%;
+	        z-index: 9999 !important;
+	    }
+	    .navbar {
+	        margin-bottom: 0px;
+	    }
+	    .affix ~ .container-fluid {
+	        position: relative;
+	        top: 50px;
+	    }
 		.navbar {
 		    border: 0;
 		    border-radius: 0;
@@ -18,11 +33,77 @@
 		    font-size: 12px;
 		    text-align: center;
 		}
+		.jumbotron {
+			margin-top: 30px;
+			border: 0.3px solid blue;
+			color: white;
+			background-color: #6699ff;
+		}
+		.jumbotron.first {
+			margin-top: 100px;
+		}
 	</style>
-</head>
-<body>
 
-<nav class="navbar navbar-inverse">
+	<script type="text/javascript">
+		$(document).ready(initializeNavbar);
+
+		function initializeNavbar() {
+			navContent = $("nav.navbar div div ul").first();
+			navRight = $("nav.navbar div div ul").last();
+
+			var userString = getCookie("user");
+			if(userString != null) {
+				var user = eval("(" + userString + ")");
+				
+				var li = $("<li></li>");
+				var a = $("<a></a>")
+						.attr("href", "");
+				var span = $("<span></span>")
+						.addClass("glyphicon glyphicon-user")
+
+				a.append(span).append(" " + user.username);
+				li.append(a);
+				navContent.append(li);
+
+				li = $("<li></li>");
+				a = $("<a></a>")
+						.attr("href", "")
+						.click(function() {
+							setCookie("user", "", -1);
+						});
+				span = $("<span></span>")
+						.addClass("glyphicon glyphicon-log-out")
+
+				a.append(span).append(" Odjava");
+				li.append(a);
+				navRight.append(li);
+			} else {
+				var li = $("<li></li>");
+				var a = $("<a></a>")
+						.attr("href", "login.html");
+				var span = $("<span></span>")
+						.addClass("glyphicon glyphicon-log-in")
+
+				a.append(span).append(" Prijava");
+				li.append(a);
+				navRight.append(li);
+
+				li = $("<li></li>");
+				a = $("<a></a>")
+						.attr("href", "register.html");
+				span = $("<span></span>")
+						.addClass("glyphicon glyphicon-user")
+
+				a.append(span).append(" Registracija");
+				li.append(a);
+				navRight.append(li);
+			}
+		}
+	</script>
+</head>
+<body data-spy="scroll" data-target=".navbar">
+
+<nav class="navbar navbar-inverse" data-spy="affix">
 	<div class="contailer-fluid">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#pageNav">
@@ -44,22 +125,42 @@
 				</li>
 				<li>
 					<a href="#">
-						<span class="glyphicon glyphicon-user"></span> Profil
-					</a>
-				</li>
-				<li>
-					<a href="#">
 						<span class="glyphicon glyphicon-search"></span> Pretraga instrukcija
 					</a>
 				</li>
 			</ul>
 
-			<ul class="nav navbar-nav navbar-right"></ul>
+			<ul class="nav navbar-nav navbar-right">
+				
+			</ul>
 		</div>
 	</div>
 </nav>
-	
-</nav>
+
+<div class="row">
+	<div class="col-xs-offset-1 col-xs-10 col-xs-offset-1 container">
+		<div class="jumbotron first">
+			<h1>Dobro došli</h1>
+			<p>Na ovom portalu brzo ćete i lako stupiti u kontnakt instruktorima širokog spektra znanja i vještina.</p>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-offset-1 col-xs-10 col-xs-offset-1 container">
+		<div class="jumbotron">
+			<h2>Pretražite bazu korisnika</h2>
+			<p>Odabirom opcije "Pretraga" možete naći instruktora za željeni predmet ili prema lokaciji.</p>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-offset-1 col-xs-10 col-xs-offset-1 container">
+		<div class="jumbotron">
+			<h2>Uredite vlastiti profil</h2>
+			<p>Prijavite se ili registrirajte te ponudite drugima instrukcije.</p>
+		</div>
+	</div>
+</div>
 
 </body>
 </html>
