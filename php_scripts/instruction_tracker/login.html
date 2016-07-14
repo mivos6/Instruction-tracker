@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Prijava</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--jQuery-->
+	<script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+	<!--Bootstrap css-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<!--Bootstrap js-->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+	<script type="text/javascript" src="common.js"></script>
+
+	<style type="text/css">
+		.container-fluid {
+			position: relative;
+			top: 200px;
+		}
+		.well, .btn, .btn:hover {
+			border: 0.3px solid blue;
+			
+		}
+		h3 {
+			margin-bottom: 20px;
+		}
+	</style>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#btnLogin").click(login);
+			$("#username").keyup(function() {
+				removeAlert("#username");
+			});
+			$("#passw").keyup(function() {
+				removeAlert("#passw");
+			});
+		});
+
+		function login() {
+			if (!validate()) {
+				return;
+			}
+
+			$.post("check_user.php",
+				{
+					username: document.forms["loginForm"]["username"].value,
+					passw: document.forms["loginForm"]["passw"].value
+				},
+				function(data, status) {
+					var response
+					
+					if (status != "success") {
+						generateAlert("Server nije dostupan.");
+						return;
+					}
+					
+					response = data.split("\n");
+					if (response[0] != "Success") {
+						generateAlert("Navedeno korisničko ime i lozinka nisu pronađeni.");
+						return;
+					}
+
+					generateSuccess("Prijavljeni ste kao <strong>" + username + "</strong>");
+					setCookie("user", response[1], 2*60*60);
+					window.location = "index.html";
+				});
+		}
+	
+		function validate() {
+			var user = document.forms["loginForm"]["username"].value,
+				pass = document.forms["loginForm"]["passw"].value,
+				userRegExp = new RegExp("^[A-Za-z0-9_]{6,64}$"),
+				passRegExp = new RegExp("^[A-Za-z0-9!#$%&?]{6,64}$");
+				
+			console.log(user);
+
+			if (!userRegExp.test(user)) {
+				$("#username").parents(".form-group").addClass("has-error");
+				generateAlert("Pogrešno korisičko ime. Korisničko ime mora imati barem 6 znakova. Dopušteni su: slova engleskog alfabeta, brojevi i znakovi \"_\" i \".\"");
+				return false;
+			}
+			if (!passRegExp.test(pass)) {
+				$("#passw").parents(".form-group").addClass("has-error");
+				generateAlert("Pogrešna lozika. Lozinka mora imati barem 6 znakovs. Dopušteni su: slova engleskog alfabeta, brojevi i znakovi \"!#$%&?\"");
+				return false;
+			}
+
+			return true;
+		}
+	</script>
+</head>
+<body>
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-xs-offset-1 col-xs-10 col-xs-offset-1 col-sm-offset-3 col-sm-6 col-sm-offset-3 col-md-offset-3 col-md-6 col-md-offset-3 well well-lg">
+			<h3>Prijava</h3>
+			<form class="form form-horizontal" name="loginForm"> <!--method="POST" action="index.php" onsubmit="return validate()"-->
+				<div class="form-group">
+					<label for="username" class="control-label col-md-3">Korisničko ime:</label>
+					<div class="col-md-9">
+						<input type="text" class="form-control" name="username" id="username">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="passw" class="control-label col-md-3">Lozinka:</label>
+					<div class="col-md-9">
+						<input type="password" class="form-control" name="passw" id="passw">
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-md-offset-3 col-md-9">
+						<button type="button" class="btn btn-default" id="btnLogin">Prijava</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-xs-offset-1 col-xs-10 col-xs-offset-1 col-sm-offset-3 col-sm-6 col-sm-offset-3 col-md-offset-3 col-md-6 col-md-offset-3" id="alertContainer">
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

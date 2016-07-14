@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Registracija</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--jQuery-->
+	<script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+	<!--Bootstrap css-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<!--Bootstrap js-->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+	<script type="text/javascript" src="common.js"></script>
+
+	<style type="text/css">
+		.container-fluid {
+			position: relative;
+			top: 50px;
+		}
+		.well, .btn, .btn:hover {
+			border: 0.3px solid blue;	
+		}
+		h3 {
+			margin-bottom: 20px;
+		}
+		#userImg {
+			display: block;
+			max-width: 100px;
+			max-height: 100px;
+			margin-bottom: 10px;
+		}
+	</style>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#btnRegister").click(function() {
+				if(validate()) {
+					postData();
+					postImage();
+				}
+			});
+
+			$("#name").keyup(function() {
+				removeAlert("#name")
+			});
+			$("#username").keyup(function() {
+				removeAlert("#username")
+			});
+			$("#passw").keyup(function() {
+				removeAlert("#passw")
+			});
+			$("#repeatPassw").keyup(function() {
+				removeAlert("#repeatPassw")
+			});
+			$("#email").keyup(function() {
+				removeAlert("#email")
+			});
+			$("#phone").keyup(function() {
+				removeAlert("#phone")
+			});
+			$("#town").keyup(function() {
+				removeAlert("#town")
+			});
+			$("#street").keyup(function() {
+				removeAlert("#street")
+			});
+			$("#houseNum").keyup(function() {
+				removeAlert("#houseNum")
+			});
+			$("#about").keyup(function() {
+				removeAlert("#about")
+			});
+
+			$("#imgLoc").change(function() {
+				var data = new FormData();
+				var file = $("#imgLoc")[0].files[0];
+				if (!file.type.match("image.*")) {
+					generateAlert("Odabrana datoteka nije slika.");
+					return;
+				}
+				if(file.size > 2048000) {
+					generateAlert("Najveća dopuštena veličina je 2 MB.");
+					return;
+				}
+				data.append("uploaded_file", file, "temp.jpg");
+
+				$.ajax({
+					url: "file_upload.php",
+					data: data,
+					cache: false,
+					contentType: false,
+					processData: false,
+					type: "POST",
+					success: function(data, status) {
+						if (status != "success") {
+							generateAlert("Server nije dostupan.");
+							return;
+						}
+						var response = data.split("\n");
+						if (response[0] != "Success") {
+							generateAlert("Upload nije uspio. " + response[1]);
+							return;
+						}
+
+						$("#userImg").attr("src", "http://instructortracker-mivos6.rhcloud.com/Uploads/temp.jpg");
+					}
+				});
+			});
+		});
+		
+		function validate() {
+			var name = document.forms["regForm"]["name"].value,
+				username = document.forms["regForm"]["username"].value,
+				passw = document.forms["regForm"]["passw"].value,
+				repeatPassw = document.forms["regForm"]["repeatPassw"].value,
+				email = document.forms["regForm"]["email"].value,
+				phone = document.forms["regForm"]["phone"].value,
+				town = document.forms["regForm"]["town"].value,
+				street = document.forms["regForm"]["street"].value,
+				houseNum = document.forms["regForm"]["houseNum"].value,
+				about = document.forms["regForm"]["about"].value,
+				userRegExp = new RegExp("^[A-Za-z0-9_]{6,64}$"),
+				passRegExp = new RegExp("^[A-Za-z0-9!#$%&?]{6,64}$"),
+				emailRegexp = new RegExp("^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])$"),
+				phoneRegExp = new RegExp("^[0-9]{5,15}$"),
+				adrRegExp = new RegExp("^[\\w ,.'-]{1,256}$"),
+				adrNumRegExp = new RegExp("^([0-9]{1,5})([A-Z]{0,3})$");
+
+				if (!name) {
+					$("#name").parents(".form-group").addClass("has-error");
+					generateAlert("Prezno polje \"Imei prezime\".");
+					return false;
+				}
+				if (!userRegExp.test(username)) {
+					$("#username").parents(".form-group").addClass("has-error");
+					generateAlert("Pogrešno korisičko ime. Korisničko ime mora imati barem 6 znakova. Dopušteni su: slova engleskog alfabeta, brojevi i znakovi \"_\" i \".\".");
+					return false;
+				}
+				if (!passRegExp.test(passw)) {
+					$("#passw").parents(".form-group").addClass("has-error");
+					generateAlert("Pogrešna lozika. Lozinka mora imati barem 6 znakovs. Dopušteni su: slova engleskog alfabeta, brojevi i znakovi \"!#$%&?\".");
+					return false;
+				}
+				if (passw != repeatPassw) {
+					$("#repeatPassw").parents(".form-group").addClass("has-error");
+					generateAlert("Ponovljena lozinka se ne podudara s originalnom.");
+					return false;
+				}
+				if (!emailRegexp.test(email)) {
+					$("#email").parents(".form-group").addClass("has-error");
+					generateAlert("Pogrešno unesena email adresa.");
+					return false;
+				}
+				if (phone != "" && !phoneRegExp.test(phone)) {
+					$("#phone").parents(".form-group").addClass("has-error");
+					generateAlert("Pogrešno unesen broj telefona.");
+					return false;
+				}
+				if (!adrRegExp.test(town)) {
+					$("#town").parents(".form-group").addClass("has-error");
+					generateAlert("Pogrešno uneseno ime grada.");
+					return false;
+				}
+				if (!adrRegExp.test(street)) {
+					$("#street").parents(".form-group").addClass("has-error");
+					generateAlert("Pogrešno uneseno ime ulice.");
+					return false;
+				}
+				if (!adrNumRegExp.test(houseNum)) {
+					$("#houseNum").parents(".form-group").addClass("has-error");
+					generateAlert("Pogrešno unesen kućni broj.");
+					return false;
+				}
+
+			return true;
+		}
+
+		function postData() {
+			$.post("insert_user.php",
+				{
+					name: document.forms["regForm"]["name"].value,
+					username: document.forms["regForm"]["username"].value,
+					passw: document.forms["regForm"]["passw"].value,
+					email: document.forms["regForm"]["email"].value,
+					phone_num: document.forms["regForm"]["phone"].value,
+					location: (document.forms["regForm"]["town"].value + "\n"
+						+ document.forms["regForm"]["street"].value + "\n"
+						+ document.forms["regForm"]["houseNum"].value),
+					about: document.forms["regForm"]["about"].value,
+					img_url: "http://instructortracker-mivos6.rhcloud.com/Uploads/" + document.forms["regForm"]["username"].value + ".jpg"
+				},
+				function(data, status) {
+					if (status != "success") {
+						generateAlert("Server nije dostupan.");
+						return;
+					}
+
+					var response = data.split("\n");
+					if (response[0] != "Success") {
+						alertString = "Registracija nije uspjela. "
+						if (response[1].indexOf("Duplicate entry") != -1) {
+							alertString += "Korisničko ime već postoji."
+							$("#username").parents(".form-group").addClass("has-error");
+						} else {
+							alertString += response[1];
+						}
+						generateAlert(alertString);
+						return;
+					}
+
+					setCookie("user", response[1], 2*60*60);
+					generateSuccess("Registrirani ste kao <strong>" 
+						+ document.forms["regForm"]["username"].value + "</strong><br>"
+						+ "<a href=\"login.html\">Prijavite se</a><br>"
+						+ "<a href=\"index.html\">Povratak na glavnu stranicu</a>");
+				});
+		}
+
+		function postImage() {
+			if($("#imgLoc")[0].files.length == 0) {
+				return;
+			}
+
+			var data = new FormData();
+			var file = $("#imgLoc")[0].files[0];
+			if (!file.type.match("image.*")) {
+				generateAlert("Odabrana datoteka nije slika.");
+				return;
+			}
+			if(file.size > 2048000) {
+				generateAlert("Najveća dopuštena veličina je 2 MB.");
+				return;
+			}
+			data.append("uploaded_file", file, document.forms["regForm"]["username"].value + ".jpg");
+
+			$.ajax({
+				url: "file_upload.php",
+				data: data,
+				cache: false,
+				contentType: false,
+				processData: false,
+				type: "POST",
+				success: function(data, status) {
+					if (status != "success") {
+						generateAlert("Server nije dostupan.");
+						return;
+					}
+					var response = data.split("\n");
+					if (response[0] != "Success") {
+						generateAlert("Upload nije uspio. " + response[1]);
+						return;
+					}
+				}
+			});
+		}
+	</script>
+</head>
+<body>
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-xs-offset-1 col-xs-10 col-xs-offset-1 col-sm-offset-3 col-sm-6 col-sm-offset-3 col-md-offset-3 col-md-6 col-md-offset-3 well well-lg">
+			<h3>Registracija</h3>
+			<form class="form form-horizontal" name="regForm">
+				<div class="form-group" align="center">
+					<img id="userImg" src="images/icon_user_default.png" align="center">
+					<label class="btn btn-default">
+					    Promijeni sliku <input id="imgLoc" type="file" style="display: none;">
+					</label>
+				</div>
+				<div class="form-group">
+					<label for="name" class="control-label col-md-3">Ime i prezime <span style="color: red;">*</span></label>
+					<div class="col-md-9">
+						<input type="text" class="form-control" name="name" id="name">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="username" class="control-label col-md-3">Korisničko ime <span style="color: red;">*</span></label>
+					<div class="col-md-9">
+						<input type="text" class="form-control" name="username" id="username">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="passw" class="control-label col-md-3">Lozinka <span style="color: red;">*</span></label>
+					<div class="col-md-9">
+						<input type="password" class="form-control" name="passw" id="passw">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="repeatPassw" class="control-label col-md-3">Ponovite lozinku <span style="color: red;">*</span></label>
+					<div class="col-md-9">
+						<input type="password" class="form-control" name="repeatPassw" id="repeatPassw">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="email" class="control-label col-md-3">Email adresa <span style="color: red;">*</span></label>
+					<div class="col-md-9">
+						<input type="email" class="form-control" name="email" id="email">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="phone" class="control-label col-md-3">Broj telefona</label>
+					<div class="col-md-9">
+						<input type="text" class="form-control" name="phone" id="phone">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="town" class="control-label col-md-3">Grad <span style="color: red;">*</span></label>
+					<div class="col-md-9">
+						<input type="text" class="form-control" name="town" id="town">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="street" class="control-label col-md-3">Ulica <span style="color: red;">*</span></label>
+					<div class="col-md-9">
+						<input type="text" class="form-control" name="street" id="street">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="houseNum" class="control-label col-md-3">Kućni broj <span style="color: red;">*</span></label>
+					<div class="col-md-9">
+						<input type="text" class="form-control" name="houseNum" id="houseNum">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="about" class="control-label col-md-3">O sebi</label>
+					<div class="col-md-9">
+						<textarea class="form-control" name="about" id="about" rows="4"></textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-md-offset-3 col-md-9">
+						<button type="button" class="btn btn-default" id="btnRegister">Registracija</button>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-md-offset-1 col-md-10 col-md-offset-1">
+						<p style="text-align: center">
+							Polja označena s <span style="color: red;">*</span> moraju obavezno biti popunjena.
+						</p>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-md-offset-1 col-md-10 col-md-offset-1">
+						<p style="text-align: center">
+							Već ste registrirani? Prijavite se <a href="login.html">ovdje</a>.
+						</p>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-offset-1 col-xs-10 col-xs-offset-1 col-sm-offset-3 col-sm-6 col-sm-offset-3 col-md-offset-3 col-md-6 col-md-offset-3" id="alertContainer">
+		</div>
+	</div>
+</div>
+
+
+</body>
+</html>
