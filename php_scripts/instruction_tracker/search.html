@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Pretraga instrukcija</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--jQuery-->
+	<script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+	<!--Bootstrap css-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<!--Bootstrap js-->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+	<script type="text/javascript" src="common.js"></script>
+
+	<style type="text/css">
+		.affix {
+	        top:0;
+	        width: 100%;
+	        z-index: 9999 !important;
+	    }
+	    .navbar {
+	        margin-bottom: 0px;
+	    }
+	    .affix ~ .container-fluid {
+	        position: relative;
+	        top: 50px;
+	    }
+		.navbar {
+		    border: 0;
+		    border-radius: 0;
+		    margin-bottom: 0;
+		    font-size: 12px;
+		    text-align: center;
+		}
+		body {
+			background-image: url("images/background.jpg");
+			background-size: cover;
+			background-repeat: no-repeat;
+		}
+
+		body .container-fluid {
+			margin-top: 20px;
+		}
+	</style>
+
+	<script type="text/javascript">
+		var results = [];
+
+		$(document).ready(function() {
+			initializeNavbar();
+
+			$("#btnSearch").click(refreshResults)
+		});
+
+		function refreshResults() {
+			var data = {};
+
+			if ($("#subjectName").val() != "") {
+				data.subject_name = $("#subjectName").val();
+			}
+			if ($("#location").val() != "") {
+				data.location = $("#location").val();
+			}
+
+			$.post("search.php",
+				data,
+				function(data, status) {
+					var response
+					
+					if (status != "success") {
+						generateAlert("Server nije dostupan.");
+						return;
+					}
+					response = data.split("\n");
+					if (response[0] != "Success") {
+						generateAlert("Upit nije uspio. " + response[1]);
+						return;
+					}
+					if (response[1] == "") {
+						generateAlert("Nije pronađen ni jedan instruktor.");
+						return;
+					}
+
+					results = [];
+					$("#results").find("*").remove();
+
+					var resultStrings = response[1].split(";");
+					resultStrings = resultStrings.slice(0, resultStrings.length-1);
+
+					var previousUsername = "";
+					var j = 0, k = 0;
+					for (var i = 0; i < resultStrings.length; i++) {
+						var res = eval("(" + resultStrings[i] + ")");
+
+						if (res.username != previousUsername) {
+							results[j] = 
+							{
+								user: 
+								{
+									username: res.username,
+									name: res.name,
+									email: res.email,
+									phone_num: res.phone_num,
+									location: res.location,
+									about: res.about,
+									img_url: res.img_url
+								},
+								subjects: []
+							};
+							previousUsername = res.username;
+							j++;
+							k = 0;
+						}
+
+						results[j - 1].subjects[k] = 
+						{
+							subject_name: res.subject_name,
+							subject_tags: res.subject_tags
+						};
+						k++;
+					}
+
+					generateSuccess("Pronađeno je " + results.length + " instruktora.");
+
+					for (var i = 0; i < results.length; i ++) {
+						$("#results").append('<div class="panel panel-default">'
+							+ '<div class="panel-heading">'
+							+ '<h4 class="panel-title">'
+							+ '<a data-toggle="collapse" data-parent="#results" href="#user' + i + '">' + results[i].user.username + '</a>'
+							+ '</h4>'
+							+ '</div>'
+							+ '<div id="user' + i + '" class="collapse panel-collapse">'
+							+ '<ul class="list-group"></ul>'
+							+ '</div>'
+							+ '</div>');
+
+						for (j = 0; j < results[i].subjects.length; j++) {
+							$("#user" + i + " ul").append('<li class="list-group-item">'
+								+ '<p><strong>Ime predmeta: </strong>' + results[i].subjects[j].subject_name + '</P>'
+								+ '<p><strong>Oznake predmeta: </strong>' + results[i].subjects[j].subject_tags + '</p>'
+								+ '</li>');
+						}
+					}
+				});
+		}
+	</script>
+</head>
+<body data-spy="scroll" data-target=".navbar">
+
+<nav class="navbar navbar-inverse" data-spy="affix">
+	<div class="contailer-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#pageNav">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="index.html">
+				<img src="images/books.png" width="25" height="25" style="display:inline"> Oglasnik Instrukcija
+			</a>
+		</div>
+
+		<div class="collapse navbar-collapse" id="pageNav">
+			<ul class="nav navbar-nav">
+				<li>
+					<a href="index.html">
+						<span class="glyphicon glyphicon-home"></span> Početna
+					</a>
+				</li>
+				<li class="active">
+					<a href="search.html">
+						<span class="glyphicon glyphicon-search"></span> Pretraga instrukcija
+					</a>
+				</li>
+			</ul>
+
+			<ul class="nav navbar-nav navbar-right"></ul>
+		</div>
+	</div>
+</nav>
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-sm-3">
+			<div class="well well-sm">
+				<h3><strong>Filtri:</strong></h3>
+				<form class="form form-horizontal" role="form" name="subjectForm">
+					<div class="form-group">
+						<label for="subjectName" class="control-label col-md-3">Ime predmeta</label>
+						<div class="col-md-9">
+							<input type="text" class="form-control" name="subjectName" id="subjectName">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="location" class="control-label col-md-3">Lokacija instruktora</label>
+						<div class="col-md-9">
+							<input type="text" class="form-control" name="location" id="location">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-3 col-sm-9">
+							<button type="button" id="btnSearch" class="btn btn-primary">Pretraži</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="col-sm-9">
+			<div class="well well-sm">
+				<h3><strong>Rezultati:</strong></h3>
+				<div id="alertContainer"></div>
+				<div class="panel-group" id="results"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

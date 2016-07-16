@@ -125,6 +125,18 @@
 
 					if (response[1] == "") {
 						$(grid[0]).append('<a id="btnAdd" class="btn btn-primary" href="#mySubjects">+</a>')
+						$("#btnAdd").attr("data-toggle", "modal");
+						$("#btnAdd").attr("data-target", "#subjectModal");
+						$("#btnAdd").click(function() {
+							$("#subjectName").val("");
+							$("#subjectTags").val("");
+							$("#btnConfirm").off();
+							$("#btnConfirm").click(function() {
+								postSubject(-1,
+									$("#subjectName").val(),
+									$("#subjectTags").val());
+							});
+						});
 						return;
 					}
 					
@@ -155,6 +167,7 @@
 							var index = $(this).parent().find("span.hidden").html();
 							$("#subjectName").val(subjectData[index].subject_name);
 							$("#subjectTags").val(subjectData[index].subject_tags);
+							$("#btnConfirm").off();
 							$("#btnConfirm").click(function() {
 								postSubject(subjectData[index].subject_id,
 									$("#subjectName").val(),
@@ -174,6 +187,7 @@
 					$("#btnAdd").click(function() {
 						$("#subjectName").val("");
 						$("#subjectTags").val("");
+						$("#btnConfirm").off();
 						$("#btnConfirm").click(function() {
 							postSubject(-1,
 								$("#subjectName").val(),
@@ -264,15 +278,13 @@
 					</a>
 				</li>
 				<li>
-					<a href="#">
+					<a href="search.html">
 						<span class="glyphicon glyphicon-search"></span> Pretraga instrukcija
 					</a>
 				</li>
 			</ul>
 
-			<ul class="nav navbar-nav navbar-right">
-				
-			</ul>
+			<ul class="nav navbar-nav navbar-right"></ul>
 		</div>
 	</div>
 </nav>
