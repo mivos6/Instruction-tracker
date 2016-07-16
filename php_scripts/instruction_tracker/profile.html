@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Moj profil</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--jQuery-->
+	<script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+	<!--Bootstrap css-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<!--Bootstrap js-->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+	<script type="text/javascript" src="common.js"></script>
+
+	<style type="text/css">
+		.affix {
+	        top:0;
+	        width: 100%;
+	        z-index: 9999 !important;
+	    }
+	    .navbar {
+	        margin-bottom: 0px;
+	    }
+	    .affix ~ .container-fluid {
+	        position: relative;
+	        top: 50px;
+	    }
+		.navbar {
+		    border: 0;
+		    border-radius: 0;
+		    margin-bottom: 0;
+		    font-size: 12px;
+		    text-align: center;
+		}
+		ul.nav.nav-tabs {
+			margin-top: 50px;
+			padding-top: 5px;
+			padding-left: 25px;
+			background-color: #6699ff;
+			border-bottom: 0.3px solid blue;
+		}
+		ul.nav.nav-tabs li a {
+			color: white;
+			font-weight: bold;
+			border: 0.3px solid blue;
+		}
+		ul.nav.nav-tabs li a:hover {
+			color: black;
+			font-weight: bold;
+			border: 0.3px solid blue;
+			border-bottom: 0.3px solid white;
+		}
+		ul.nav.nav-tabs li.active a {
+			color: black;
+			font-weight: bold;
+			border: 0.3px solid blue;
+			border-bottom: 0.3px solid white;
+		}
+		div.tab-content {
+			padding: 20px;
+		}
+		body {
+			background-image: url("images/background.jpg");
+			background-size: cover;
+			background-repeat: no-repeat;
+		}
+		.panel {
+			word-wrap: break-word;
+		}
+	</style>
+
+	<script type="text/javascript">
+		var grid;
+		var subjectData = [];
+
+		$(document).ready(function() {
+			initializeNavbar();
+
+			var userString = getCookie("user");
+			if (userString != null) {
+				setCookie("user", userString, 2*60*60);
+				$("ul:first-child li:last-child").addClass("active");
+
+				grid = $("#mySubjects .container-fluid .row div");
+				
+				setData(userString);
+				setSubjects(userString);
+			} else {
+				$(".nav.nav-tabs, .tab-content").remove();
+				generateAlert("Vaša prijava je istekla.");
+			}
+		});
+
+		function setData(userString) {
+			var user = eval("(" + userString + ")");
+
+			$("#userimg").attr("src", user.img_url);
+			$("#name").html(user.name);
+			$("#username").html(user.username);
+			$("#email").html(user.email);
+			$("#phone").html(user.phone_num);
+			$("#location").html(user.location);
+			$("#about").html(user.about);
+		}
+
+		function setSubjects(userString) {
+			var user = eval("(" + userString + ")")
+
+			$.post("get_user_subjects.php",
+				{ username: user.username },
+				function(data, status) {
+					var response
+					
+					if (status != "success") {
+						generateAlert("Server nije dostupan.");
+						return;
+					}
+					
+					response = data.split("\n");
+					if (response[0] != "Success") {
+						generateAlert("Podaci nisu pronađeni. " + response[1]);
+						return;
+					}
+
+					if (response[1] == "") {
+						$(grid[0]).append('<a id="btnAdd" class="btn btn-primary" href="#mySubjects">+</a>')
+						return;
+					}
+					
+					var subjects = response[1].split(";");
+					subjects = subjects.slice(0, subjects.length-1);
+
+					for (var k = 0; k < subjects.length; k++) {
+						subjectData[k] = eval("(" + subjects[k] + ")");
+					}
+
+					var i;
+					for (i = 0; i < subjects.length; i++) {
+						$(grid[i]).append('<div class="panel panel-default">'
+								+ '<div class="panel-heading">'
+								+ '<h4 class="panel-title">' + subjectData[i].subject_name + '</h4>'
+								+ '</div>'
+								+ '<div class="panel-body"><strong>Oznake: </strong>' + subjectData[i].subject_tags + '</div>'
+								+ '<div class="panel-footer" align="right">'
+								+ '<a class="btn btn-primary" href="#mySubjects" id="btnEdit">Uredi</a> '
+								+ '<a class="btn btn-primary" href="#mySubjects" id="btnDelete">Obriši</a>'
+								+ '<span class="hidden">' + i + '</span>'
+								+ '</div>'
+								+ '</div>');
+
+						$(grid[i]).find("#btnEdit").attr("data-toggle", "modal");
+						$(grid[i]).find("#btnEdit").attr("data-target", "#subjectModal");
+						$(grid[i]).find("#btnEdit").click(function() {
+							var index = $(this).parent().find("span.hidden").html();
+							$("#subjectName").val(subjectData[index].subject_name);
+							$("#subjectTags").val(subjectData[index].subject_tags);
+							$("#btnConfirm").click(function() {
+								postSubject(subjectData[index].subject_id,
+									$("#subjectName").val(),
+									$("#subjectTags").val());
+							});
+						});
+
+						$(grid[i]).find("#btnDelete").click(function() {
+							var index = $(this).parent().find("span.hidden").html();
+							removeSubject(subjectData[index].subject_id);
+						});
+					}
+					$(grid[i]).append('<a id="btnAdd" class="btn btn-primary" href="#mySubjects">+</a>');
+
+					$("#btnAdd").attr("data-toggle", "modal");
+					$("#btnAdd").attr("data-target", "#subjectModal");
+					$("#btnAdd").click(function() {
+						$("#subjectName").val("");
+						$("#subjectTags").val("");
+						$("#btnConfirm").click(function() {
+							postSubject(-1,
+								$("#subjectName").val(),
+								$("#subjectTags").val());
+						});
+					});
+				});
+		}
+
+		function postSubject(id, name, tags) {
+			$.post(id==-1?"insert_subject.php":"update_subject.php",
+				{
+					subject_id: id,
+					username: eval("(" + getCookie("user") + ")").username,
+					subject_name: name,
+					subject_tags: tags
+				},
+				function(data, status) {
+					var response
+
+					console.log(response);
+					
+					if (status != "success") {
+						generateAlert("Server nije dostupan.");
+						return;
+					}
+					
+					response = data.split("\n");
+					if (response[0] != "Success") {
+						generateAlert("Podaci nisu pronađeni. " + response[1]);
+						return;
+					}
+
+					resetSubjects();
+				});
+		}
+
+		function removeSubject(id) {
+			$.post("remove_subject.php",
+				{ subject_id: id},
+				function(data, status) {
+					var response
+					
+					if (status != "success") {
+						generateAlert("Server nije dostupan.");
+						return;
+					}
+					
+					response = data.split("\n");
+					if (response[0] != "Success") {
+						generateAlert("Podaci nisu pronađeni. " + response[1]);
+						return;
+					}
+
+					resetSubjects();
+				});
+		}
+
+		function resetSubjects() {
+			for (var i = 0; i < grid.length; i++) {
+				$(grid[i]).find("*").remove();
+			}
+
+			setSubjects(getCookie("user"));
+		}
+	</script>
+</head>
+<body data-spy="scroll" data-target=".navbar">
+
+<nav class="navbar navbar-inverse" data-spy="affix">
+	<div class="contailer-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#pageNav">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="index.html">
+				<img src="images/books.png" width="25" height="25" style="display:inline"> Oglasnik Instrukcija
+			</a>
+		</div>
+
+		<div class="collapse navbar-collapse" id="pageNav">
+			<ul class="nav navbar-nav">
+				<li>
+					<a href="index.html">
+						<span class="glyphicon glyphicon-home"></span> Početna
+					</a>
+				</li>
+				<li>
+					<a href="#">
+						<span class="glyphicon glyphicon-search"></span> Pretraga instrukcija
+					</a>
+				</li>
+			</ul>
+
+			<ul class="nav navbar-nav navbar-right">
+				
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<ul class="nav nav-tabs">
+	<li class="active"><a data-toggle="tab" href="#myProfile">Moj profil</a></li>
+	<li ><a data-toggle="tab" href="#mySubjects">Moji predmeti</a></li>
+</ul>
+
+<div class="tab-content">
+	<div id="myProfile" class="tab-pane fade fade in active">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-4 col-md-3">
+					<div class="well well-sm">
+						<img id="userimg" src="" onerror="this.src = 'images/icon_user_default.png'" class="img-responsive">
+					</div>
+					<div class="well well-sm">
+						<h4>O meni</h4>
+						<p id="about"></p>
+					</div>
+				</div>
+				<div class="col-sm-8 col-md-9">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">Podaci:</h3>
+						</div>
+						<ul class="list-group">
+							<li class="list-group-item"><strong>Ime i prezime: </strong><span id="name"></span></li>
+							<li class="list-group-item"><strong>Korisničko ime: </strong><span id="username"></span></li>
+							<li class="list-group-item"><strong>Email adresa: </strong><span id="email"></span></li>
+							<li class="list-group-item"><strong>Telefon: </strong><span id="phone"></span></li>
+							<li class="list-group-item"><strong>Lokacija: </strong><br><span id="location"></span></li>
+						</ul>
+						<div class="panel-footer" align="right">
+							<a class="btn btn-primary" href="register.html">Uredi podatke</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="mySubjects" class="tab-pane fade">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-xs-offset-1 col-xs-10 col-xs-offset-1 col-sm-offset-3 col-sm-6 col-sm-offset-3 col-md-offset-3 col-md-6 col-md-offset-3" id="alertContainer" style="margin-top: 50px">
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" role="dialog" id="subjectModal">
+	<div class="modal-dialog " style="position:relative; top:50px;">
+		<!--Modal contents-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<div class="modal-title">
+					<h4>Podaci o predmetu</h4>
+				</div>
+			</div>
+			<div class="modal-body">
+				<form class="form form-horizontal" role="form" name="subjectForm">
+					<div class="form-group">
+						<label for="subjectName" class="control-label col-sm-2">Ime</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" name="subjectName" id="subjectName">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="subjectTags" class="control-label col-sm-2">Oznake</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" name="subjectTags" id="subjectTags">
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal" id="btnConfirm">Confirm</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

@@ -58,3 +58,56 @@ function removeAlert(id) {
 	$(id).parents(".form-group").removeClass("has-error");
 	$("#alertContainer *").remove();
 }
+
+function initializeNavbar() {
+	navContent = $("nav.navbar div div ul").first();
+	navRight = $("nav.navbar div div ul").last();
+
+	var userString = getCookie("user");
+	if(userString != null) {
+		var user = eval("(" + userString + ")");
+		
+		var li = $("<li></li>");
+		var a = $("<a></a>")
+				.attr("href", "profile.html");
+		var span = $("<span></span>")
+				.addClass("glyphicon glyphicon-user")
+
+		a.append(span).append(" " + user.username);
+		li.append(a);
+		navContent.append(li);
+
+		li = $("<li></li>");
+		a = $("<a></a>")
+				.attr("href", "index.html")
+				.click(function() {
+					setCookie("user", "", -1);
+				});
+		span = $("<span></span>")
+				.addClass("glyphicon glyphicon-log-out")
+
+		a.append(span).append(" Odjava");
+		li.append(a);
+		navRight.append(li);
+	} else {
+		var li = $("<li></li>");
+		var a = $("<a></a>")
+				.attr("href", "login.html");
+		var span = $("<span></span>")
+				.addClass("glyphicon glyphicon-log-in")
+
+		a.append(span).append(" Prijava");
+		li.append(a);
+		navRight.append(li);
+
+		li = $("<li></li>");
+		a = $("<a></a>")
+				.attr("href", "register.html");
+		span = $("<span></span>")
+				.addClass("glyphicon glyphicon-user")
+
+		a.append(span).append(" Registracija");
+		li.append(a);
+		navRight.append(li);
+	}
+}

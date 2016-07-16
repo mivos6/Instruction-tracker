@@ -36,69 +36,23 @@
 		.jumbotron {
 			margin-top: 30px;
 			border: 0.3px solid blue;
-			color: white;
 			background-color: #6699ff;
+			opacity: 0.8;
 		}
 		.jumbotron.first {
 			margin-top: 100px;
 		}
+		body {
+			background-image: url("images/background.jpg");
+			background-size: cover;
+			background-repeat: no-repeat;
+		}
 	</style>
 
 	<script type="text/javascript">
-		$(document).ready(initializeNavbar);
-
-		function initializeNavbar() {
-			navContent = $("nav.navbar div div ul").first();
-			navRight = $("nav.navbar div div ul").last();
-
-			var userString = getCookie("user");
-			if(userString != null) {
-				var user = eval("(" + userString + ")");
-				
-				var li = $("<li></li>");
-				var a = $("<a></a>")
-						.attr("href", "");
-				var span = $("<span></span>")
-						.addClass("glyphicon glyphicon-user")
-
-				a.append(span).append(" " + user.username);
-				li.append(a);
-				navContent.append(li);
-
-				li = $("<li></li>");
-				a = $("<a></a>")
-						.attr("href", "")
-						.click(function() {
-							setCookie("user", "", -1);
-						});
-				span = $("<span></span>")
-						.addClass("glyphicon glyphicon-log-out")
-
-				a.append(span).append(" Odjava");
-				li.append(a);
-				navRight.append(li);
-			} else {
-				var li = $("<li></li>");
-				var a = $("<a></a>")
-						.attr("href", "login.html");
-				var span = $("<span></span>")
-						.addClass("glyphicon glyphicon-log-in")
-
-				a.append(span).append(" Prijava");
-				li.append(a);
-				navRight.append(li);
-
-				li = $("<li></li>");
-				a = $("<a></a>")
-						.attr("href", "register.html");
-				span = $("<span></span>")
-						.addClass("glyphicon glyphicon-user")
-
-				a.append(span).append(" Registracija");
-				li.append(a);
-				navRight.append(li);
-			}
-		}
+		$(document).ready(function() {
+			initializeNavbar();
+		});
 	</script>
 </head>
 <body data-spy="scroll" data-target=".navbar">
@@ -140,7 +94,7 @@
 <div class="row">
 	<div class="col-xs-offset-1 col-xs-10 col-xs-offset-1 container">
 		<div class="jumbotron first">
-			<h1>Dobro došli</h1>
+			<h1><strong>Dobro došli</strong></h1>
 			<p>Na ovom portalu brzo ćete i lako stupiti u kontnakt instruktorima širokog spektra znanja i vještina.</p>
 		</div>
 	</div>
@@ -148,7 +102,7 @@
 <div class="row">
 	<div class="col-xs-offset-1 col-xs-10 col-xs-offset-1 container">
 		<div class="jumbotron">
-			<h2>Pretražite bazu korisnika</h2>
+			<h2><strong>Pretražite bazu korisnika</strong></h2>
 			<p>Odabirom opcije "Pretraga" možete naći instruktora za željeni predmet ili prema lokaciji.</p>
 		</div>
 	</div>
@@ -156,7 +110,7 @@
 <div class="row">
 	<div class="col-xs-offset-1 col-xs-10 col-xs-offset-1 container">
 		<div class="jumbotron">
-			<h2>Uredite vlastiti profil</h2>
+			<h2><strong>Uredite vlastiti profil</strong></h2>
 			<p>Prijavite se ili registrirajte te ponudite drugima instrukcije.</p>
 		</div>
 	</div>

@@ -34,6 +34,11 @@
 
 	<script type="text/javascript">
 		$(document).ready(function() {
+			var userString = getCookie("user");
+			if (userString != null) {
+				setData(userString);
+			}
+
 			$("#btnRegister").click(function() {
 				if(validate()) {
 					postData();
@@ -83,7 +88,7 @@
 					generateAlert("Najveća dopuštena veličina je 2 MB.");
 					return;
 				}
-				data.append("uploaded_file", file, "temp.jpg");
+				data.append("uploaded_file", file, "imagetemp.jpg");
 
 				$.ajax({
 					url: "file_upload.php",
@@ -103,7 +108,7 @@
 							return;
 						}
 
-						$("#userImg").attr("src", "http://instructortracker-mivos6.rhcloud.com/Uploads/temp.jpg");
+						$("#userImg").attr("src", "http://instructortracker-mivos6.rhcloud.com/Uploads/imagetemp.jpg");
 					}
 				});
 			});
@@ -177,7 +182,7 @@
 		}
 
 		function postData() {
-			$.post("insert_user.php",
+			$.post(getCookie("user")!=null?"update_user.php":"insert_user.php",
 				{
 					name: document.forms["regForm"]["name"].value,
 					username: document.forms["regForm"]["username"].value,
@@ -188,7 +193,8 @@
 						+ document.forms["regForm"]["street"].value + "\n"
 						+ document.forms["regForm"]["houseNum"].value),
 					about: document.forms["regForm"]["about"].value,
-					img_url: "http://instructortracker-mivos6.rhcloud.com/Uploads/" + document.forms["regForm"]["username"].value + ".jpg"
+					img_url: "http://instructortracker-mivos6.rhcloud.com/Uploads/" + document.forms["regForm"]["username"].value + ".jpg",
+					old_username: getCookie("user")!=null?eval("(" + getCookie("user") + ")").username:""
 				},
 				function(data, status) {
 					if (status != "success") {
@@ -209,11 +215,12 @@
 						return;
 					}
 
-					setCookie("user", response[1], 2*60*60);
+					setCookie("user", "", -1);
 					generateSuccess("Registrirani ste kao <strong>" 
 						+ document.forms["regForm"]["username"].value + "</strong><br>"
 						+ "<a href=\"login.html\">Prijavite se</a><br>"
 						+ "<a href=\"index.html\">Povratak na glavnu stranicu</a>");
+					$("#btnRegister").toggleClass("disabled");
 				});
 		}
 
@@ -254,6 +261,24 @@
 				}
 			});
 		}
+
+		function setData(userString) {
+			var user = eval("(" + userString + ")");
+
+			$("#userImg").attr("src", user.img_url);
+			$("#name").val(user.name);
+			$("#username").val(user.username);
+			$("#passw").val(user.passw);
+			$("#repeatPassw").val(user.passw);
+			$("#email").val(user.email);
+			$("#phone").val(user.phone_num);
+			$("#about").val(user.about);
+
+			var locArray = user.location.split("\n");
+			$("#town").val(locArray[0]);
+			$("#street").val(locArray[1]);
+			$("#houseNum").val(locArray[2]);
+		}
 	</script>
 </head>
 <body>
@@ -262,7 +287,7 @@
 	<div class="row">
 		<div class="col-xs-offset-1 col-xs-10 col-xs-offset-1 col-sm-offset-3 col-sm-6 col-sm-offset-3 col-md-offset-3 col-md-6 col-md-offset-3 well well-lg">
 			<h3>Registracija</h3>
-			<form class="form form-horizontal" name="regForm">
+			<form class="form form-horizontal" role="form" name="regForm">
 				<div class="form-group" align="center">
 					<img id="userImg" src="images/icon_user_default.png" align="center">
 					<label class="btn btn-default">
