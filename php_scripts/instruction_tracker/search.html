@@ -46,25 +46,37 @@
 
 	<script type="text/javascript">
 		var results = [];
+		var filters = {};
 
 		$(document).ready(function() {
 			initializeNavbar();
 
-			$("#btnSearch").click(refreshResults)
+			var resStr = getCookie("results");
+			if (resStr != null) {
+				filters = eval("(" + getCookie("filters") + ")");
+				$("#subjectName").val(filters.subject_name);
+				$("#location").val(filters.location);
+
+				results = eval("(" + resStr + ")");
+				setResults();
+			}
+
+			$("#btnSearch").click(refreshResults);
+			$("#btnClear").click(clearResults);
 		});
 
 		function refreshResults() {
-			var data = {};
+			filters = {};
 
 			if ($("#subjectName").val() != "") {
-				data.subject_name = $("#subjectName").val();
+				filters.subject_name = $("#subjectName").val();
 			}
 			if ($("#location").val() != "") {
-				data.location = $("#location").val();
+				filters.location = $("#location").val();
 			}
 
 			$.post("search.php",
-				data,
+				filters,
 				function(data, status) {
 					var response
 					
@@ -123,37 +135,54 @@
 
 					generateSuccess("Pronađeno je " + results.length + " instruktora.");
 
-					for (var i = 0; i < results.length; i ++) {
-						$("#results").append('<div class="panel panel-default">'
-							+ '<div class="panel-heading">'
-							+ '<h4 class="panel-title">'
-							+ '<a data-toggle="collapse" data-parent="#results" href="#user' + i + '">' + results[i].user.username + '</a>'
-							+ '</h4>'
-							+ '</div>'
-							+ '<div id="user' + i + '" class="collapse panel-collapse">'
-							+ '<ul class="list-group"></ul>'
-							+ '</div>'
-							+ '<div class="panel-footer">'
-							+ '<p><strong>' + results[i].user.location.split("\n")[0] + '</strong></p>'
-							+ '<p align="right"><a id="btnUserInfo' + i + '" href="user_info.html">Više informacija</a></p>'
-							+ '<span class="hidden">' + i + '</span>'
-							+ '</div>'
-							+ '</div>');
+					setResults();
 
-						for (j = 0; j < results[i].subjects.length; j++) {
-							$("#user" + i + " ul").append('<li class="list-group-item">'
-								+ '<p><strong>Ime predmeta: </strong>' + results[i].subjects[j].subject_name + '</P>'
-								+ '<p><strong>Oznake predmeta: </strong>' + results[i].subjects[j].subject_tags + '</p>'
-								+ '</li>');
-						}
-
-						$("#btnUserInfo" + i).click(function() {
-							var index = $(this).parent().next().html();
-							console.log(index);
-							setCookie("info", JSON.stringify(results[index].user), 60*60);
-						});
-					}
+					setCookie("filters", JSON.stringify(filters), 60*60);
+					setCookie("results", JSON.stringify(results), 60*60);
 				});
+		}
+
+		function setResults() {
+			for (var i = 0; i < results.length; i ++) {
+				$("#results").append('<div class="panel panel-default">'
+					+ '<div class="panel-heading">'
+					+ '<h4 class="panel-title">'
+					+ '<a data-toggle="collapse" data-parent="#results" href="#user' + i + '">' + results[i].user.username + '</a>'
+					+ '</h4>'
+					+ '</div>'
+					+ '<div id="user' + i + '" class="collapse panel-collapse">'
+					+ '<ul class="list-group"></ul>'
+					+ '</div>'
+					+ '<div class="panel-footer">'
+					+ '<p><strong>' + results[i].user.location.split("\n")[0] + '</strong></p>'
+					+ '<p align="right"><a id="btnUserInfo' + i + '" href="user_info.html">Više informacija</a></p>'
+					+ '<span class="hidden">' + i + '</span>'
+					+ '</div>'
+					+ '</div>');
+
+				for (j = 0; j < results[i].subjects.length; j++) {
+					$("#user" + i + " ul").append('<li class="list-group-item">'
+						+ '<p><strong>Ime predmeta: </strong>' + results[i].subjects[j].subject_name + '</P>'
+						+ '<p><strong>Oznake predmeta: </strong>' + results[i].subjects[j].subject_tags + '</p>'
+						+ '</li>');
+				}
+
+				$("#btnUserInfo" + i).click(function() {
+					var index = $(this).parent().next().html();
+					console.log(index);
+					setCookie("info", JSON.stringify(results[index].user), 60*60);
+				});
+			}
+		}
+
+		function clearResults() {
+			results = [];
+			filters = {};
+
+			$("#subjectName").val("");
+			$("#location").val("");
+			$("#results").find("*").remove();
+			$("#alertContainer").find("*").remove();
 		}
 	</script>
 </head>
@@ -212,6 +241,11 @@
 					<div class="form-group">
 						<div class="col-sm-offset-3 col-sm-9">
 							<button type="button" id="btnSearch" class="btn btn-primary">Pretraži</button>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-3 col-sm-9">
+							<button type="button" id="btnClear" class="btn btn-primary">Oćisti pretragu</button>
 						</div>
 					</div>
 				</form>
