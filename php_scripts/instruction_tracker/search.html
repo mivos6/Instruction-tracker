@@ -178,6 +178,8 @@
 		function clearResults() {
 			results = [];
 			filters = {};
+			setCookie("results", "", -1);
+			setCookie("filters", "", -1);
 
 			$("#subjectName").val("");
 			$("#location").val("");
