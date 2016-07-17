@@ -133,6 +133,11 @@
 							+ '<div id="user' + i + '" class="collapse panel-collapse">'
 							+ '<ul class="list-group"></ul>'
 							+ '</div>'
+							+ '<div class="panel-footer">'
+							+ '<p><strong>' + results[i].user.location.split("\n")[0] + '</strong></p>'
+							+ '<p align="right"><a id="btnUserInfo' + i + '" href="user_info.html">Više informacija</a></p>'
+							+ '<span class="hidden">' + i + '</span>'
+							+ '</div>'
 							+ '</div>');
 
 						for (j = 0; j < results[i].subjects.length; j++) {
@@ -141,6 +146,12 @@
 								+ '<p><strong>Oznake predmeta: </strong>' + results[i].subjects[j].subject_tags + '</p>'
 								+ '</li>');
 						}
+
+						$("#btnUserInfo" + i).click(function() {
+							var index = $(this).parent().next().html();
+							console.log(index);
+							setCookie("info", JSON.stringify(results[index].user), 60*60);
+						});
 					}
 				});
 		}
