@@ -48,6 +48,7 @@
 		var results = [];
 		var filters = {};
 		var map;
+		var markers = [];
 
 		$(document).ready(function() {
 			initializeNavbar();
@@ -97,6 +98,7 @@
 
 					results = [];
 					$("#results").find("*").remove();
+					deleteMarkers();
 
 					var resultStrings = response[1].split(";");
 					resultStrings = resultStrings.slice(0, resultStrings.length-1);
@@ -137,6 +139,7 @@
 					generateSuccess("Pronađeno je " + results.length + " instruktora.");
 
 					setResults();
+					$.each(results, setMarker);
 
 					setCookie("filters", JSON.stringify(filters), 60*60);
 					setCookie("results", JSON.stringify(results), 60*60);
@@ -182,6 +185,8 @@
 			setCookie("results", "", -1);
 			setCookie("filters", "", -1);
 
+			deleteMarkers();
+
 			$("#subjectName").val("");
 			$("#location").val("");
 			$("#results").find("*").remove();
@@ -208,6 +213,7 @@
 							map: map,
 							position: res[0].geometry.location
 						});
+						markers[markers.length] = marker;
 
 						var infoWindow = new google.maps.InfoWindow({
 							content: d.user.username
@@ -215,6 +221,13 @@
 						infoWindow.open(map, marker);
 					}
 				});
+		}
+
+		function deleteMarkers() {
+			$.each(markers, function(i, d) {
+				d.setMap(null);
+			});
+			markers = [];
 		}
 	</script>
 </head>
